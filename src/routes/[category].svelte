@@ -83,18 +83,14 @@
 	$: fetchItems(storyIds);
 </script>
 
-<h1>{category}</h1>
-
 {#if errorMessage}
 	<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
 {/if}
 
-{#if stories}
-	{#each stories as story}
-		{#if story !== undefined && story['id'] !== ''}
-			<ItemSummary item={story} pageCategory={category} />
-		{/if}
-	{/each}
-{/if}
+{#each stories as story}
+	{#if story !== undefined && story['id'] !== ''}
+		<ItemSummary item={story} pageCategory={category} />
+	{/if}
+{/each}
 
 <button on:click={fetchMore} class="text-gray-500">Load more...</button>

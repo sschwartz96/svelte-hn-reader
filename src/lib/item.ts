@@ -16,7 +16,7 @@ type Item = {
 	descendants: number[]; // In the case of stories or polls, the total comment count.
 
 	// additional
-	rank: Record<string, number> // Number that the item is ranked on the current page
+	rank: Record<string, number>; // Number that the item is ranked on the current page
 };
 
 export type { Item };

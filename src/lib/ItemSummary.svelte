@@ -40,12 +40,16 @@
 	<span class="text-lg text-gray-500">&#8593;</span>
 	<div class="flex flex-col space-x-0">
 		<div>
-			<a href={item.url} class="text-lg">{item.title}</a>
+			<a
+				href={item.url}
+				class="text-lg text-black dark:text-gray-200 visited:text-gray-500 dark:visited:text-gray-400"
+				>{item.title}</a
+			>
 			{#if item.url}
-				<span class="text-gray-500 text-sm">({getBaseURL(item.url)})</span>
+				<span class="text-gray-500 dark:text-gray-400 text-sm">({getBaseURL(item.url)})</span>
 			{/if}
 		</div>
-		<div class="text-gray-500 text-xs">
+		<div class="text-gray-500 dark:text-gray-400 text-xs">
 			{item.score} points by {item.by}
 			{getTimeAgo(item.time)}
 		</div>
