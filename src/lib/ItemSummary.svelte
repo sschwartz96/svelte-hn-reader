@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { item } from '$lib/item';
+	import type { Item } from '$lib/item';
 
 	function getBaseURL(url: string): string {
 		if (url === undefined) return '';
@@ -32,7 +32,7 @@
 	}
 
 	export let pageCategory: string; // pageRank is the number displayed to the left of the item
-	export let item: item;
+	export let item: Item;
 </script>
 
 <div class="wrapper">
