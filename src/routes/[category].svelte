@@ -79,8 +79,16 @@
 		fetchItems(storyIds);
 	}
 
-	// when storyIds changes we want to update what is shown
-	$: fetchItems(storyIds);
+	// reset the state of the page based on the cateogry
+	function resetState(category: string) {
+		category = category; // just to prevent linter
+		prevLength = 0;
+		maxLength = 30;
+		stories = new Array<Item>(30);
+	}
+
+	$: resetState(category);
+	$: fetchItems(storyIds); // when storyIds changes we want to update what is shown
 </script>
 
 {#if errorMessage}
