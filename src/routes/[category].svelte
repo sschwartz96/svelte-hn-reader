@@ -49,7 +49,6 @@
 	import { page } from '$app/stores';
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { fade } from 'svelte/transition';
-	import { tick } from 'svelte';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -58,6 +57,10 @@
 	let prevLength = 0;
 	let maxLength = 30;
 	let stories: Item[] = new Array<Item>();
+
+	const sleep = (milliseconds: number) => {
+		return new Promise((resolve) => setTimeout(resolve, milliseconds));
+	};
 
 	type fetchItemResponse = {
 		item: Item;
@@ -80,32 +83,19 @@
 		}
 	}
 
-	async function fetchItems(ids: number[]) {
-		new Promise<Item[]>((resolve, reject) => {
-			let newItems = new Array<Item>();
-			let finished = false;
-			console.log('fetchItems() =' + category);
-			for (let i = prevLength; i < maxLength; i++) {
-				let url = base_url + item_url.replace('{id}', ids[i].toString());
-
-				/* let fetchItemRes = await fetchItem(url, i + 1, category); */
-				/* if (fetchItemRes.errorMessage !== undefined && fetchItemRes.errorMessage.length > 0) { */
-				/* 	errorMessage = fetchItemRes.errorMessage; */
-				/* 	return; */
-				/* } */
-				/* stories = [...stories, fetchItemRes.item]; */
-
-				fetchItem(url, i + 1, category)
-					.then((data) => {
-						newItems[data.item.rank[category] - 1] = data.item;
-					})
-					.catch((err) => (errorMessage = err));
-			}
-			resolve(newItems);
-		}).then((res) => {
-
-			stories = [...stories, ...res];
-		});
+	function fetchItems(ids: number[]) {
+		console.log('fetchItems() =' + category);
+		for (let i = prevLength; i < maxLength; i++) {
+			let url = base_url + item_url.replace('{id}', ids[i].toString());
+			fetchItem(url, i + 1, category).then(async (data) => {
+				while (stories.length != data.item.rank[category] - 1) {
+					console.log('stories: ' + stories.length);
+					console.log('rank: ' + data.item.rank[category]);
+					await sleep(50);
+				}
+				stories[data.item.rank[category] - 1] = data.item;
+			});
+		}
 	}
 
 	function fetchMore() {
@@ -141,4 +131,4 @@
 		</div>
 	{/each}
 {/if}
-<button on:click={fetchMore} class="text-gray-500">Load more...</button>
+<button on:click={fetchMore} class="pt-2 pb-4 text-gray-500">Load more...</button>
