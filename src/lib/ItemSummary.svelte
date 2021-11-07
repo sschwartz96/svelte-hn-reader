@@ -1,7 +1,5 @@
 <script lang="ts">
 	import type { Item } from '$lib/item';
-	import { page } from '$app/stores';
-	import { fade } from 'svelte/transition';
 
 	function getBaseURL(url: string): string {
 		if (url === undefined) return '';
@@ -33,54 +31,42 @@
 		return a + b + ' ' + 'ago';
 	}
 
-	function determineCategory(category: string) {
-		switch (category) {
-			case 'top':
-				return 'topstories.json';
-			case 'newest':
-				return 'newstories.json';
-			case 'ask':
-				return 'askstories.json';
-			case 'show':
-				return 'showstories.json';
-			case 'jobs':
-				return 'jobstories.json';
+	function getRank(item: Item, category: string) {
+		if (category in item.rank) return item.rank[category];
+		for (let c in item.rank) {
+			return item.rank[c];
 		}
 	}
 
-	let category = '';
-
-	export let pageCategory: string; // pageRank is the number displayed to the left of the item
+	export let pageCategory: string;
 	export let item: Item;
 
-	$: category = determineCategory($page.params.category);
+	/* $: category = determineCategory($page.params.category); */
 </script>
 
-{#if category in item.rank}
-	<div class="wrapper">
-		<span class="rank">{item.rank[category]}.</span>
-		<span class="text-lg text-gray-500">&#8593;</span>
-		<div class="flex flex-col space-x-0">
-			<div>
-				<a
-					href={item.url}
-					class="text-lg text-black dark:text-gray-200 visited:text-gray-500 dark:visited:text-gray-400"
-					>{item.title}</a
-				>
-				{#if item.url}
-					<span class="text-gray-500 dark:text-gray-400 text-sm">({getBaseURL(item.url)})</span>
-				{/if}
-			</div>
-			<div class="text-gray-500 dark:text-gray-400 text-xs">
-				{item.score} points by {item.by}
-				{getTimeAgo(item.time)}
-				{#if item.kids}
-					| {item.kids.length} comments
-				{/if}
-			</div>
+<div class="wrapper">
+	<span class="rank">{getRank(item, pageCategory)}.</span>
+	<span class="text-lg text-gray-500">&#8593;</span>
+	<div class="flex flex-col space-x-0">
+		<div>
+			<a
+				href={item.url}
+				class="text-lg text-black dark:text-gray-200 visited:text-gray-500 dark:visited:text-gray-400"
+				>{item.title}</a
+			>
+			{#if item.url}
+				<span class="text-gray-500 dark:text-gray-400 text-sm">({getBaseURL(item.url)})</span>
+			{/if}
+		</div>
+		<div class="text-gray-500 dark:text-gray-400 text-xs">
+			{item.score} points by {item.by}
+			{getTimeAgo(item.time)}
+			{#if item.kids}
+				| {item.kids.length} comments
+			{/if}
 		</div>
 	</div>
-{/if}
+</div>
 
 <style lang="postcss">
 	.wrapper {

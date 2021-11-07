@@ -46,9 +46,9 @@
 </script>
 
 <script lang="ts">
-	import { page } from '$app/stores';
 	import ItemSummary from '$lib/ItemSummary.svelte';
-	import { fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
+	import { tick } from 'svelte';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -67,11 +67,13 @@
 		errorMessage: string;
 	};
 
+	// fetchItem fetches an individual item based on its id
 	async function fetchItem(
-		url: string,
+		id: number,
 		index: number,
 		category: string
 	): Promise<fetchItemResponse> {
+		let url = base_url + item_url.replace('{id}', id.toString());
 		let res = await fetch(url);
 		if (res.ok) {
 			let val = await res.json();
@@ -83,52 +85,59 @@
 		}
 	}
 
+	// fetchItems fetches hacker news items based on story ids
+	// updates global variable "storyIds"
 	function fetchItems(ids: number[]) {
-		console.log('fetchItems() =' + category);
 		for (let i = prevLength; i < maxLength; i++) {
-			let url = base_url + item_url.replace('{id}', ids[i].toString());
-			fetchItem(url, i + 1, category).then(async (data) => {
+			// go ahead and call a fetchItem async function to fetch data
+			fetchItem(ids[i], i + 1, category).then(async (data) => {
+				// a little hack to keep the news items in order
+				let tries = 0;
+				const sleepTime = 15;
 				while (stories.length != data.item.rank[category] - 1) {
-					console.log('stories: ' + stories.length);
-					console.log('rank: ' + data.item.rank[category]);
-					await sleep(50);
+					if (tries * sleepTime > 10000) break; // break out if we are stuck after 10 seconds
+					await sleep(sleepTime);
+					tries++;
 				}
+
+				// once our "turn" we can update "stories" which will update the DOM
+				await sleep(5); // added for visual appeal
 				stories[data.item.rank[category] - 1] = data.item;
 			});
 		}
 	}
 
+	// fetches more items
 	function fetchMore() {
 		prevLength = maxLength;
 		maxLength += 30;
-		/* stories.length = maxLength; */
 		fetchItems(storyIds);
 	}
 
 	// reset the state of the page based on the cateogry
 	async function resetState(category: string) {
-		console.log('resetState:  cat =' + category);
-		console.log('resetState2: page =' + $page.path);
 		category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
 		stories = new Array<Item>();
-		//stories = new Array<Item>(30);
+		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
+		await sleep(100);
+		await tick();
+		await sleep(100);
+		fetchItems(storyIds);
 	}
 
+	// use a reactive statement to update page based on "category"
 	$: resetState(category);
-	$: fetchItems(storyIds);
 </script>
 
 {#if errorMessage}
 	<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
 {/if}
 
-{#if stories.length > 0}
-	{#each stories as story (story.id)}
-		<div transition:fade|local>
-			<ItemSummary item={story} pageCategory={category} />
-		</div>
-	{/each}
-{/if}
+{#each stories as story}
+	<div in:fly={{ x: 250, duration: 250 }} out:fly={{ x: -250, duration: 250 }}>
+		<ItemSummary item={story} pageCategory={category} />
+	</div>
+{/each}
 <button on:click={fetchMore} class="pt-2 pb-4 text-gray-500">Load more...</button>
