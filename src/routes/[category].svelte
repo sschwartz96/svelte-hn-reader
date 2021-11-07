@@ -54,6 +54,7 @@
 	export let errorMessage = undefined;
 	export let storyIds: number[];
 
+	let showMoreButton = false;
 	let prevLength = 0;
 	let maxLength = 30;
 	let stories: Item[] = new Array<Item>();
@@ -103,6 +104,9 @@
 				// once our "turn" we can update "stories" which will update the DOM
 				await sleep(5); // added for visual appeal
 				stories[data.item.rank[category] - 1] = data.item;
+
+				// check if we are at the end to show the more button
+				if (i + 1 == maxLength) showMoreButton = true;
 			});
 		}
 	}
@@ -119,6 +123,7 @@
 		category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
+		showMoreButton = false; // hide while loading
 		stories = new Array<Item>();
 		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
 		await sleep(100);
@@ -131,13 +136,18 @@
 	$: resetState(category);
 </script>
 
-{#if errorMessage}
-	<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
-{/if}
+<div class="flex flex-col">
+	{#if errorMessage}
+		<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
+	{/if}
 
-{#each stories as story}
-	<div in:fly={{ x: 250, duration: 250 }} out:fly={{ x: -250, duration: 250 }}>
-		<ItemSummary item={story} pageCategory={category} />
-	</div>
-{/each}
-<button on:click={fetchMore} class="pt-2 pb-4 text-gray-500">Load more...</button>
+	{#each stories as story}
+		<div in:fly={{ x: 250, duration: 250 }} out:fly={{ x: -250, duration: 250 }}>
+			<ItemSummary item={story} pageCategory={category} />
+		</div>
+	{/each}
+	<div class="flex-grow" />
+	{#if showMoreButton}
+		<button on:click={fetchMore} class="pt-2 pb-4 text-left text-gray-500">Load more...</button>
+	{/if}
+</div>
