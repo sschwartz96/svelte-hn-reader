@@ -1,4 +1,4 @@
-type item = {
+type Item = {
 	id: string; // The item's unique id
 	deleted: boolean; // true if item is deleted.
 	type: string; // The type of item. One of "job", "story", "comment", "poll", or "pollopt".
@@ -16,7 +16,7 @@ type item = {
 	descendants: number[]; // In the case of stories or polls, the total comment count.
 
 	// additional
-	rank: Record<string, number> // Number that the item is ranked on the current page
+	rank: Record<string, number>; // Number that the item is ranked on the current page
 };
 
-export type { item };
+export type { Item };

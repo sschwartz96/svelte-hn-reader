@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { item } from '$lib/item';
+	import type { Item } from '$lib/item';
 
 	function getBaseURL(url: string): string {
 		if (url === undefined) return '';
@@ -31,23 +31,39 @@
 		return a + b + ' ' + 'ago';
 	}
 
-	export let pageCategory: string; // pageRank is the number displayed to the left of the item
-	export let item: item;
+	function getRank(item: Item, category: string) {
+		if (category in item.rank) return item.rank[category];
+		for (let c in item.rank) {
+			return item.rank[c];
+		}
+	}
+
+	export let pageCategory: string;
+	export let item: Item;
+
+	/* $: category = determineCategory($page.params.category); */
 </script>
 
 <div class="wrapper">
-	<span class="rank">{item.rank[pageCategory]}.</span>
+	<span class="rank">{getRank(item, pageCategory)}.</span>
 	<span class="text-lg text-gray-500">&#8593;</span>
 	<div class="flex flex-col space-x-0">
 		<div>
-			<a href={item.url} class="text-lg">{item.title}</a>
+			<a
+				href={item.url}
+				class="text-lg text-black dark:text-gray-200 visited:text-gray-500 dark:visited:text-gray-400"
+				>{item.title}</a
+			>
 			{#if item.url}
-				<span class="text-gray-500 text-sm">({getBaseURL(item.url)})</span>
+				<span class="text-gray-500 dark:text-gray-400 text-sm">({getBaseURL(item.url)})</span>
 			{/if}
 		</div>
-		<div class="text-gray-500 text-xs">
+		<div class="text-gray-500 dark:text-gray-400 text-xs">
 			{item.score} points by {item.by}
 			{getTimeAgo(item.time)}
+			{#if item.kids}
+				| {item.kids.length} comments
+			{/if}
 		</div>
 	</div>
 </div>

@@ -1,5 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
+	<script>
+		if (!('theme' in localStorage)) {
+			localStorage.theme = 'dark';
+			document.documentElement.classList.add('dark');
+			themeText = 'light';
+		} else {
+			if (localStorage.theme === 'dark') {
+				themeText = 'light';
+				document.documentElement.classList.add('dark');
+			} else {
+				themeText = 'dark';
+				document.documentElement.classList.remove('dark');
+			}
+		}
+	</script>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="/favicon.png" />
