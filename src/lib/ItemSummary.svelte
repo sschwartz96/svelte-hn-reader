@@ -62,7 +62,9 @@
 			{item.score} points by {item.by}
 			{getTimeAgo(item.time)}
 			{#if item.kids}
-				| <a href="/comments/{item.id}">{item.kids.length} comments</a>
+				| <a sveltekit:prefetch sveltekit:noscroll href="/comments/{item.id}"
+					>{item.kids.length} comments</a
+				>
 			{/if}
 		</div>
 	</div>
