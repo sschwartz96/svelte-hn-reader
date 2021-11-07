@@ -62,7 +62,7 @@
 			{item.score} points by {item.by}
 			{getTimeAgo(item.time)}
 			{#if item.kids}
-				| {item.kids.length} comments
+				| <a href="/comments/{item.id}">{item.kids.length} comments</a>
 			{/if}
 		</div>
 	</div>
