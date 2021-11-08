@@ -23,7 +23,6 @@
 		return {
 			props: {
 				storyIds: ids,
-				/* stories: stories, */
 				category: category
 			}
 		};
@@ -112,10 +111,14 @@
 	}
 
 	// fetches more items
-	function fetchMore() {
+	async function fetchMore() {
 		prevLength = maxLength;
 		maxLength += 30;
 		fetchItems(storyIds);
+
+		/* await sleep(100); */
+		/* // scroll down half the page */
+		/* window.scrollBy(0, window.innerHeight / 2); */
 	}
 
 	// reset the state of the page based on the cateogry
@@ -141,11 +144,17 @@
 		<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
 	{/if}
 
-	{#each stories as story}
-		<div in:fly={{ x: 250, duration: 250 }} out:fly={{ x: -250, duration: 250 }}>
+	{#each stories as story, i}
+		<div
+			class="flex space-x-2 items-baseline mb-2"
+			in:fly={{ x: 250, duration: 250 }}
+			out:fly={{ x: -250, duration: 250 }}
+		>
+			<span class="w-8 text-xl text-gray-400 text-right">{i + 1}.</span>
 			<ItemSummary item={story} pageCategory={category} />
 		</div>
 	{/each}
+
 	<div class="flex-grow" />
 	{#if showMoreButton}
 		<button on:click={fetchMore} class="pt-2 pb-4 text-left text-gray-500">Load more...</button>

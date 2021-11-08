@@ -19,14 +19,14 @@
 		}
 
 		const item: Item = await res.json();
-		const commentIds = item.kids;
+		const itemIds = item.kids;
 
-		const commentsRes = await loadComments(commentIds, fetch);
-		const comments = commentsRes.map((val) => val.item);
+		const itemRes = await loadComments(itemIds, fetch);
+		const items = itemRes.map((val) => val.item);
 
 		return {
 			props: {
-				importedComments: comments
+				importedItems: items
 			}
 		};
 	}
@@ -36,13 +36,15 @@
 		errorMessage: string;
 	};
 
+	type fetchFnType = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+
 	// TODO: remove duplication also located in routes/[category].svelte
 	// fetchItem fetches an individual item based on its id
 	async function fetchItem(
 		id: number,
 		index: number,
 		category: string,
-		fetch
+		fetch: fetchFnType
 	): Promise<fetchItemResponse> {
 		const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
 		let res = await fetch(url);
@@ -57,7 +59,7 @@
 	}
 
 	// TODO: refactor as comments are just items
-	async function loadComments(ids: number[], fetch) {
+	async function loadComments(ids: number[], fetch: fetchFnType) {
 		let loadFns = ids.map((val, index) => fetchItem(val, index, 'comment', fetch));
 		// TODO: make sure to handle error handling
 		return Promise.all(loadFns);
@@ -65,32 +67,33 @@
 </script>
 
 <script lang="ts">
+	import ItemDetail from '$lib/ItemDetail.svelte';
 	import { fly } from 'svelte/transition';
 
-	let comments: Item[] = new Array();
+	let items: Item[] = new Array();
 
-	export let importedComments: Item[];
+	export let importedItems: Item[];
 
 	const sleep = (milliseconds: number) => {
 		return new Promise((resolve) => setTimeout(resolve, milliseconds));
 	};
 
-	async function resetState(c: Item[]) {
+	async function resetState(_items: Item[]) {
 		await sleep(10);
-		comments = c;
+		items = _items;
 	}
 
-	$: resetState(importedComments);
+	$: resetState(importedItems);
 </script>
 
-<!-- TODO: add parent item -->
+<p class="mb-8 text-white">TODO: add parent item</p>
 
-{#each comments as comment (comment.id)}
+{#each items as item (item.id)}
 	<div
 		class="mb-4 dark:text-gray-300"
 		in:fly|local={{ x: 250, duration: 250 }}
 		out:fly={{ x: -250, duration: 250 }}
 	>
-		<p class="max-w-4xl comment">{@html comment.text}</p>
+		<ItemDetail {item} />
 	</div>
 {/each}
