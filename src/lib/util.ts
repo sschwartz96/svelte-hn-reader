@@ -6,7 +6,7 @@ export function getTimeAgo(time: number): string {
 	const sub = new Date().getTime() - time * 1000;
 	const minutes = Math.round(sub / 60000);
 	let a = minutes;
-	let b = 'm ago';
+	let b = 'm';
 
 	if (minutes >= 518400) {
 		a = Math.floor(minutes / 518400);

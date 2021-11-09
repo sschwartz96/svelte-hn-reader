@@ -26,6 +26,7 @@
 
 		return {
 			props: {
+				parentItem: item,
 				importedItems: items
 			}
 		};
@@ -68,10 +69,12 @@
 
 <script lang="ts">
 	import ItemDetail from '$lib/ItemDetail.svelte';
+	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { fly } from 'svelte/transition';
 
 	let items: Item[] = new Array();
 
+	export let parentItem: Item;
 	export let importedItems: Item[];
 
 	const sleep = (milliseconds: number) => {
@@ -86,14 +89,12 @@
 	$: resetState(importedItems);
 </script>
 
-<p class="mb-8 text-white">TODO: add parent item</p>
+<div class="mb-8">
+	<ItemSummary item={parentItem} pageCategory={''} />
+</div>
 
 {#each items as item (item.id)}
-	<div
-		class="mb-4 dark:text-gray-300"
-		in:fly|local={{ x: 250, duration: 250 }}
-		out:fly={{ x: -250, duration: 250 }}
-	>
+	<div class="dark:text-gray-300">
 		<ItemDetail {item} />
 	</div>
 {/each}

@@ -20,3 +20,15 @@ type Item = {
 };
 
 export type { Item };
+
+export async function getItem(id: number): Promise<Item> {
+	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
+	const res = await fetch(url);
+	return await res.json();
+}
+
+export async function getItems(ids: number[]): Promise<Item[]> {
+	const getItemFns = ids.map((val) => getItem(val));
+	return await Promise.all(getItemFns);
+}
+
