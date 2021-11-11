@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
 	import type { Item } from '$lib/item';
+	import { createNullItem, createUndefinedItem } from '$lib/item';
 
 	const base_url = 'https://hacker-news.firebaseio.com/v0/';
 	const item_url = 'item/{id}.json';
@@ -77,11 +78,17 @@
 		let res = await fetch(url);
 		if (res.ok) {
 			let val = await res.json();
+			if (val === null) {
+				return { item: createNullItem(id, index), errorMessage: undefined };
+			}
 			val.rank = {};
 			val.rank[category] = index;
 			return { item: val, errorMessage: undefined };
 		} else {
-			return { item: undefined, errorMessage: 'Error receiving data from API' };
+			return {
+				item: createUndefinedItem(id, index),
+				errorMessage: 'Error receiving data from API'
+			};
 		}
 	}
 
@@ -151,7 +158,7 @@
 			out:fly={{ x: -250, duration: 250 }}
 		>
 			<span class="w-8 text-xl text-gray-400 text-right">{i + 1}.</span>
-			<ItemSummary item={story} pageCategory={category} />
+			<ItemSummary item={story} />
 		</div>
 	{/each}
 

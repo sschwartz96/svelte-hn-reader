@@ -24,12 +24,16 @@
 	out:fly={{ x: -250, duration: 250 }}
 >
 	<div class="dark:text-gray-400">
+		<span class="text-lg text-gray-500">&#8593;</span>
 		{item.by === undefined ? 'deleted' : item.by}
 		{getTimeAgo(item.time)}
 		<a href="#{item.parent}">parent</a>
 	</div>
 	<p class="max-w-4xl">{@html item.text === undefined ? 'deleted' : item.text}</p>
 	<div class="ml-8">
+		{#if item.kids !== undefined && item.kids.length > 0 && children.length === 0}
+			<p>Loading...</p>
+		{/if}
 		{#each children as child}
 			<svelte:self item={child} />
 		{/each}

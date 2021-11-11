@@ -9,20 +9,10 @@
 		return parts.length > 1 ? parts[0] : url;
 	}
 
-	function getRank(item: Item, category: string) {
-		if (category in item.rank) return item.rank[category];
-		for (let c in item.rank) {
-			return item.rank[c];
-		}
-	}
-
-	export let pageCategory: string;
 	export let item: Item;
-
-	/* $: category = determineCategory($page.params.category); */
 </script>
 
-<div class="wrapper">
+<div class="wrapper" id={item.id}>
 	<span class="text-lg text-gray-500">&#8593;</span>
 	<div class="flex flex-col space-x-0">
 		<div>
