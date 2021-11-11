@@ -85,4 +85,3 @@ export function createUndefinedItem(id: number, index: number): Item {
 		deleted: false,
 		descendants: []
 	};
-}

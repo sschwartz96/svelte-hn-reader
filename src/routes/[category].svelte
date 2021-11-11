@@ -118,6 +118,7 @@
 	}
 
 	// fetches more items
+
 	async function fetchMore() {
 		prevLength = maxLength;
 		maxLength += 30;
@@ -134,6 +135,7 @@
 		prevLength = 0;
 		maxLength = 30;
 		showMoreButton = false; // hide while loading
+
 		stories = new Array<Item>();
 		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
 		await sleep(100);

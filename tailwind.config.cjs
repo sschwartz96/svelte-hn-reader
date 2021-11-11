@@ -13,7 +13,6 @@ const config = {
 			green: colors.green,
 		}
 	},
-
 	plugins: []
 };
 

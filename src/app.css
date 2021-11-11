@@ -1,5 +1,6 @@
 /* Write your global styles here, in PostCSS syntax */
 @tailwind base;
+
 html {
   scroll-behavior: smooth;
 }

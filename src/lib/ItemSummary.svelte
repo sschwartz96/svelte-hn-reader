@@ -2,13 +2,6 @@
 	import type { Item } from '$lib/item';
 	import { getTimeAgo } from './util';
 
-	function getBaseURL(url: string): string {
-		if (url === undefined) return '';
-		url = url.replace('https://', '').replace('http://', '').replace('www.', '');
-		let parts = url.split('/');
-		return parts.length > 1 ? parts[0] : url;
-	}
-
 	export let item: Item;
 </script>
 
