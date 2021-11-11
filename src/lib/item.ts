@@ -16,7 +16,72 @@ type Item = {
 	descendants: number[]; // In the case of stories or polls, the total comment count.
 
 	// additional
+	lastUpdated: number; // last time the item was downloaded from API
 	rank: Record<string, number>; // Number that the item is ranked on the current page
 };
 
 export type { Item };
+
+const itemStore: Record<string, Item> = new Record();
+
+export async function getItem(id: number): Promise<Item> {
+	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
+	const res = await fetch(url);
+	if (!res.ok) throw 'Error fetching data from API';
+
+	const item: Item = await res.json();
+	if (item === null) createNullItem(id, 0);
+
+	return item;
+}
+
+export async function getItems(ids: number[]): Promise<Item[]> {
+	try {
+		const getItemFns = ids.map((val) => getItem(val));
+		return await Promise.all(getItemFns);
+	} catch (err) {
+		console.log('getItems() error');
+	}
+	return [];
+}
+
+export function createNullItem(id: number, index: number): Item {
+	return {
+		id: id.toString(),
+		by: 'null',
+		url: '',
+		type: '',
+		time: 0,
+		text: 'API return null for this item',
+		dead: false,
+		poll: 0,
+		kids: [],
+		rank: { category: index },
+		score: 0,
+		title: 'API return null for this item',
+		parts: [],
+		parent: 0,
+		deleted: false,
+		descendants: []
+	};
+}
+
+export function createUndefinedItem(id: number, index: number): Item {
+	return {
+		id: id.toString(),
+		by: 'undefined',
+		url: '',
+		type: '',
+		time: 0,
+		text: 'Error while retrieving this item',
+		dead: false,
+		poll: 0,
+		kids: [],
+		rank: { category: index },
+		score: 0,
+		title: 'Error while retrieving this item',
+		parts: [],
+		parent: 0,
+		deleted: false,
+		descendants: []
+	};

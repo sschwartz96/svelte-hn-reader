@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
 	import type { Item } from '$lib/item';
+	import { createNullItem, createUndefinedItem } from '$lib/item';
 
 	const base_url = 'https://hacker-news.firebaseio.com/v0/';
 	const item_url = 'item/{id}.json';
@@ -23,7 +24,6 @@
 		return {
 			props: {
 				storyIds: ids,
-				/* stories: stories, */
 				category: category
 			}
 		};
@@ -54,6 +54,7 @@
 	export let errorMessage = undefined;
 	export let storyIds: number[];
 
+	let showMoreButton = false;
 	let prevLength = 0;
 	let maxLength = 30;
 	let stories: Item[] = new Array<Item>();
@@ -77,11 +78,17 @@
 		let res = await fetch(url);
 		if (res.ok) {
 			let val = await res.json();
+			if (val === null) {
+				return { item: createNullItem(id, index), errorMessage: undefined };
+			}
 			val.rank = {};
 			val.rank[category] = index;
 			return { item: val, errorMessage: undefined };
 		} else {
-			return { item: undefined, errorMessage: 'Error receiving data from API' };
+			return {
+				item: createUndefinedItem(id, index),
+				errorMessage: 'Error receiving data from API'
+			};
 		}
 	}
 
@@ -103,15 +110,23 @@
 				// once our "turn" we can update "stories" which will update the DOM
 				await sleep(5); // added for visual appeal
 				stories[data.item.rank[category] - 1] = data.item;
+
+				// check if we are at the end to show the more button
+				if (i + 1 == maxLength) showMoreButton = true;
 			});
 		}
 	}
 
 	// fetches more items
-	function fetchMore() {
+
+	async function fetchMore() {
 		prevLength = maxLength;
 		maxLength += 30;
 		fetchItems(storyIds);
+
+		/* await sleep(100); */
+		/* // scroll down half the page */
+		/* window.scrollBy(0, window.innerHeight / 2); */
 	}
 
 	// reset the state of the page based on the cateogry
@@ -119,6 +134,8 @@
 		category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
+		showMoreButton = false; // hide while loading
+
 		stories = new Array<Item>();
 		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
 		await sleep(100);
@@ -131,13 +148,24 @@
 	$: resetState(category);
 </script>
 
-{#if errorMessage}
-	<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
-{/if}
+<div class="flex flex-col">
+	{#if errorMessage}
+		<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
+	{/if}
 
-{#each stories as story}
-	<div in:fly={{ x: 250, duration: 250 }} out:fly={{ x: -250, duration: 250 }}>
-		<ItemSummary item={story} pageCategory={category} />
-	</div>
-{/each}
-<button on:click={fetchMore} class="pt-2 pb-4 text-gray-500">Load more...</button>
+	{#each stories as story, i}
+		<div
+			class="flex space-x-2 items-baseline mb-2"
+			in:fly={{ x: 250, duration: 250 }}
+			out:fly={{ x: -250, duration: 250 }}
+		>
+			<span class="w-8 text-xl text-gray-400 text-right">{i + 1}.</span>
+			<ItemSummary item={story} />
+		</div>
+	{/each}
+
+	<div class="flex-grow" />
+	{#if showMoreButton}
+		<button on:click={fetchMore} class="pt-2 pb-4 text-left text-gray-500">Load more...</button>
+	{/if}
+</div>

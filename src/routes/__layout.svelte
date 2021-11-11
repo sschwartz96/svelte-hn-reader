@@ -5,10 +5,12 @@
 	import '../app.css';
 </script>
 
-<div class="w-10/12 mt-2 mx-auto">
+<div class="flex flex-col min-h-screen w-10/12 mt-2 mx-auto">
 	<Header />
 
-	<slot />
+	<main class="flex-grow">
+		<slot />
+	</main>
 
 	<Footer />
 </div>
