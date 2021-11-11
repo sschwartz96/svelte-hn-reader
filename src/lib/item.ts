@@ -16,13 +16,13 @@ type Item = {
 	descendants: number[]; // In the case of stories or polls, the total comment count.
 
 	// additional
-	lastUpdated: number; // last time the item was downloaded from API
+	lastUpdated: number; // last time the item was downloaded from API in milliseconds
 	rank: Record<string, number>; // Number that the item is ranked on the current page
 };
 
 export type { Item };
 
-const itemStore: Record<string, Item> = new Record();
+const itemStore: Record<string, Item> = {};
 
 export async function getItem(id: number): Promise<Item> {
 	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
@@ -62,7 +62,8 @@ export function createNullItem(id: number, index: number): Item {
 		parts: [],
 		parent: 0,
 		deleted: false,
-		descendants: []
+		descendants: [],
+		lastUpdated: (new Date()).getTime(),
 	};
 }
 
@@ -83,5 +84,7 @@ export function createUndefinedItem(id: number, index: number): Item {
 		parts: [],
 		parent: 0,
 		deleted: false,
-		descendants: []
+		descendants: [],
+		lastUpdated: (new Date()).getTime(),
 	};
+}

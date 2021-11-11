@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Item } from '$lib/item';
-	import { getTimeAgo } from './util';
+	import { getBaseURL, getTimeAgo } from './util';
 
 	export let item: Item;
 </script>

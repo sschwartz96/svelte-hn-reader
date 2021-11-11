@@ -1,5 +1,14 @@
 // Utility functions shared across multiple files
 
+// getBaseURL takes a URL and returns only the domain name and top level domain
+// ex. https://www.example.com/this/is/an/example -> example.com
+export function getBaseURL(url: string): string {
+	if (url === undefined) return '';
+	url = url.replace('https://', '').replace('http://', '').replace('www.', '');
+	const parts = url.split('/');
+	return parts.length > 1 ? parts[0] : url;
+}
+
 
 // getTimeAgo takes unix time in seconds and give the appropriate "hours ago" text
 export function getTimeAgo(time: number): string {
