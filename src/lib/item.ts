@@ -22,15 +22,21 @@ type Item = {
 
 export type { Item };
 
-const itemStore: Record<string, Item> = {};
+const itemStore: Record<number, Item> = {};
 
 export async function getItem(id: number): Promise<Item> {
+	if (itemStore[id]) {
+		console.log('item retrieved from store');
+		return itemStore[id];
+	}
 	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
 	const res = await fetch(url);
 	if (!res.ok) throw 'Error fetching data from API';
 
 	const item: Item = await res.json();
 	if (item === null) createNullItem(id, 0);
+
+	itemStore[id] = item;
 
 	return item;
 }
