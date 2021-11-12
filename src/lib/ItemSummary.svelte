@@ -3,6 +3,7 @@
 	import { getBaseURL, getTimeAgo } from './util';
 
 	export let item: Item;
+	export let showText: boolean;
 </script>
 
 <div class="wrapper" id={item.id}>
@@ -25,8 +26,15 @@
 				| <a sveltekit:prefetch sveltekit:noscroll href="/item/{item.id}"
 					>{item.kids.length} comments</a
 				>
+			{:else}
+				| <a sveltekit:prefetch sveltekit:noscroll href="/item/{item.id}"> comments</a>
 			{/if}
 		</div>
+		{#if showText && item.text}
+			<div>
+				{@html item.text}
+			</div>
+		{/if}
 	</div>
 </div>
 

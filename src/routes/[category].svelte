@@ -109,7 +109,7 @@
 			out:fly={{ x: -250, duration: 250 }}
 		>
 			<span class="w-8 text-xl text-gray-400 text-right">{i + 1}.</span>
-			<ItemSummary item={story} />
+			<ItemSummary item={story} showText={false} />
 		</div>
 	{/each}
 
@@ -118,4 +118,3 @@
 		<button on:click={fetchMore} class="pt-2 pb-4 text-left text-gray-500">Load more...</button>
 	{/if}
 </div>
-

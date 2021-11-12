@@ -25,7 +25,8 @@ export type { Item };
 const itemStore: Record<number, Item> = {};
 
 export async function getItem(id: number): Promise<Item> {
-	if (itemStore[id]) {
+	const currentTime = (new Date()).getTime();
+	if (itemStore[id] && (currentTime - itemStore[id].lastUpdated) < 60000) {
 		console.log('item retrieved from store');
 		return itemStore[id];
 	}
@@ -35,6 +36,8 @@ export async function getItem(id: number): Promise<Item> {
 
 	const item: Item = await res.json();
 	if (item === null) createNullItem(id, 0);
+	if (item === undefined) createUndefinedItem(id, 0);
+	item.lastUpdated = currentTime;
 
 	itemStore[id] = item;
 

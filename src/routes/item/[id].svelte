@@ -66,7 +66,7 @@
 
 {#if !errorMessage}
 	<div class="mb-8">
-		<ItemSummary item={parentItem} />
+		<ItemSummary item={parentItem} showText={true} />
 	</div>
 
 	{#each items as item (item.id)}
