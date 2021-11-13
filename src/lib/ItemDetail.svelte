@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { Item, getItems } from './item';
+	import { Item, getItems, getTotalDescendents } from './item';
 	import { getTimeAgo } from './util';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
 
 	let children: Item[] = new Array();
+	let expandText = ' - ';
 	let expanded = true;
+	let descendentCount = 0;
 
 	onMount(async () => {
 		if (item.kids && item.kids.length > 0) {
@@ -16,14 +18,16 @@
 		}
 	});
 
-	function toggle() {
+	async function toggle() {
+		descendentCount = await getTotalDescendents(item.id);
 		expanded = !expanded;
+		expandText = expandText === ' - ' ? descendentCount.toString() + ' more' : ' - ';
 	}
 
 	export let item: Item;
 </script>
 
-<div id={item.id} class="mt-4" transition:slide={{ easing: sineInOut }}>
+<div id={item.id.toString()} class="mt-4" transition:slide={{ easing: sineInOut }}>
 	<div class="text-gray-500 dark:text-gray-400">
 		<span class="text-lg text-gray-500">&#8593;</span>
 
@@ -31,7 +35,7 @@
 		{getTimeAgo(item.time)}
 
 		<a href="#{item.parent}">parent</a>
-		<button on:click={toggle}>collapse</button>
+		<button on:click={toggle}>[{expandText}]</button>
 	</div>
 
 	{#if expanded}

@@ -74,5 +74,6 @@
 			<ItemDetail {item} />
 		</div>
 	{/each}
+{:else}
+	<span>Error retrieving item: {errorMessage}</span>
 {/if}
-<span>Error retrieving item: {errorMessage}</span>
