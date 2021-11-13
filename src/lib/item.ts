@@ -1,5 +1,5 @@
 type Item = {
-	id: string; // The item's unique id
+	id: number; // The item's unique id
 	deleted: boolean; // true if item is deleted.
 	type: string; // The type of item. One of "job", "story", "comment", "poll", or "pollopt".
 	by: string; // The username of the item's author.
@@ -13,7 +13,7 @@ type Item = {
 	score: number; // The story's score, or the votes for a pollopt.
 	title: string; // The title of the story, poll or job. HTML.
 	parts: number[]; // A list of related pollopts, in display order.
-	descendants: number[]; // In the case of stories or polls, the total comment count.
+	descendants: number; // In the case of stories or polls, the total comment count.
 
 	// additional
 	lastUpdated: number; // last time the item was downloaded from API in milliseconds
@@ -22,22 +22,45 @@ type Item = {
 
 export type { Item };
 
-const itemStore: Record<string, Item> = {};
+const itemStore: Record<number, Item> = {};
 
-export async function getItem(id: number): Promise<Item> {
+// getTotalDescendents returns the total amount of descendants of an item including itself
+export async function getTotalDescendents(id: number): Promise<number> {
+	const item = await getItem(id, false);
+	let sum = 1;
+	if (item.kids) {
+		for (const childId of item.kids) {
+			sum += await getTotalDescendents(childId);
+		}
+	}
+	return sum;
+}
+
+// getItem returns the item with of the following id
+// caches for 1 minute
+// invalidate ignores the cache limit
+export async function getItem(id: number, invalidate: boolean): Promise<Item> {
+	const currentTime = (new Date()).getTime();
+	if (itemStore[id] && (!invalidate || (currentTime - itemStore[id].lastUpdated) < 60000)) {
+		return itemStore[id];
+	}
 	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
 	const res = await fetch(url);
 	if (!res.ok) throw 'Error fetching data from API';
 
 	const item: Item = await res.json();
 	if (item === null) createNullItem(id, 0);
+	if (item === undefined) createUndefinedItem(id, 0);
+	item.lastUpdated = currentTime;
+
+	itemStore[id] = item;
 
 	return item;
 }
 
 export async function getItems(ids: number[]): Promise<Item[]> {
 	try {
-		const getItemFns = ids.map((val) => getItem(val));
+		const getItemFns = ids.map((val) => getItem(val, true));
 		return await Promise.all(getItemFns);
 	} catch (err) {
 		console.log('getItems() error');
@@ -47,7 +70,7 @@ export async function getItems(ids: number[]): Promise<Item[]> {
 
 export function createNullItem(id: number, index: number): Item {
 	return {
-		id: id.toString(),
+		id: id,
 		by: 'null',
 		url: '',
 		type: '',
@@ -69,7 +92,7 @@ export function createNullItem(id: number, index: number): Item {
 
 export function createUndefinedItem(id: number, index: number): Item {
 	return {
-		id: id.toString(),
+		id: id,
 		by: 'undefined',
 		url: '',
 		type: '',

@@ -33,3 +33,9 @@ export function getTimeAgo(time: number): string {
 
 	return a + b + ' ' + 'ago';
 }
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export function sleep(milliseconds: number) {
+	return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+

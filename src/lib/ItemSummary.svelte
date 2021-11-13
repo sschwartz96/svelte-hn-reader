@@ -3,9 +3,12 @@
 	import { getBaseURL, getTimeAgo } from './util';
 
 	export let item: Item;
+	export let showText: boolean;
+
+	console.log(item.descendants);
 </script>
 
-<div class="wrapper" id={item.id}>
+<div class="wrapper" id={item.id.toString()}>
 	<span class="text-lg text-gray-500">&#8593;</span>
 	<div class="flex flex-col space-x-0">
 		<div>
@@ -23,10 +26,17 @@
 			{getTimeAgo(item.time)}
 			{#if item.kids}
 				| <a sveltekit:prefetch sveltekit:noscroll href="/item/{item.id}"
-					>{item.kids.length} comments</a
+					>{item.descendants} comments</a
 				>
+			{:else}
+				| <a sveltekit:prefetch sveltekit:noscroll href="/item/{item.id}"> comments</a>
 			{/if}
 		</div>
+		{#if showText && item.text}
+			<div>
+				{@html item.text}
+			</div>
+		{/if}
 	</div>
 </div>
 

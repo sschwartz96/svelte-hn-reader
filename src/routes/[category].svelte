@@ -1,9 +1,6 @@
 <script context="module" lang="ts">
 	import type { Item } from '$lib/item';
-	import { createNullItem, createUndefinedItem } from '$lib/item';
 
-	const base_url = 'https://hacker-news.firebaseio.com/v0/';
-	const item_url = 'item/{id}.json';
 	/**
 	 * @type {import('@sveltejs/kit').Load}
 	 */
@@ -49,6 +46,8 @@
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { fly } from 'svelte/transition';
 	import { tick } from 'svelte';
+	import { getItems } from '$lib/item';
+	import { sleep } from '$lib/util';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -59,74 +58,21 @@
 	let maxLength = 30;
 	let stories: Item[] = new Array<Item>();
 
-	const sleep = (milliseconds: number) => {
-		return new Promise((resolve) => setTimeout(resolve, milliseconds));
-	};
-
-	type fetchItemResponse = {
-		item: Item;
-		errorMessage: string;
-	};
-
-	// fetchItem fetches an individual item based on its id
-	async function fetchItem(
-		id: number,
-		index: number,
-		category: string
-	): Promise<fetchItemResponse> {
-		let url = base_url + item_url.replace('{id}', id.toString());
-		let res = await fetch(url);
-		if (res.ok) {
-			let val = await res.json();
-			if (val === null) {
-				return { item: createNullItem(id, index), errorMessage: undefined };
-			}
-			val.rank = {};
-			val.rank[category] = index;
-			return { item: val, errorMessage: undefined };
-		} else {
-			return {
-				item: createUndefinedItem(id, index),
-				errorMessage: 'Error receiving data from API'
-			};
+	async function fetchItems() {
+		showMoreButton = false;
+		const items = await getItems(storyIds.slice(prevLength, maxLength));
+		for (let i = 0; i < items.length; i++) {
+			await sleep(25);
+			stories = [...stories, items[i]];
 		}
+		showMoreButton = true;
 	}
-
-	// fetchItems fetches hacker news items based on story ids
-	// updates global variable "storyIds"
-	function fetchItems(ids: number[]) {
-		for (let i = prevLength; i < maxLength; i++) {
-			// go ahead and call a fetchItem async function to fetch data
-			fetchItem(ids[i], i + 1, category).then(async (data) => {
-				// a little hack to keep the news items in order
-				let tries = 0;
-				const sleepTime = 15;
-				while (stories.length != data.item.rank[category] - 1) {
-					if (tries * sleepTime > 10000) break; // break out if we are stuck after 10 seconds
-					await sleep(sleepTime);
-					tries++;
-				}
-
-				// once our "turn" we can update "stories" which will update the DOM
-				await sleep(5); // added for visual appeal
-				stories[data.item.rank[category] - 1] = data.item;
-
-				// check if we are at the end to show the more button
-				if (i + 1 == maxLength) showMoreButton = true;
-			});
-		}
-	}
-
-	// fetches more items
 
 	async function fetchMore() {
 		prevLength = maxLength;
 		maxLength += 30;
-		fetchItems(storyIds);
-
-		/* await sleep(100); */
-		/* // scroll down half the page */
-		/* window.scrollBy(0, window.innerHeight / 2); */
+		sleep(100);
+		fetchItems();
 	}
 
 	// reset the state of the page based on the cateogry
@@ -141,7 +87,7 @@
 		await sleep(100);
 		await tick();
 		await sleep(100);
-		fetchItems(storyIds);
+		fetchItems();
 	}
 
 	// use a reactive statement to update page based on "category"
@@ -160,7 +106,7 @@
 			out:fly={{ x: -250, duration: 250 }}
 		>
 			<span class="w-8 text-xl text-gray-400 text-right">{i + 1}.</span>
-			<ItemSummary item={story} />
+			<ItemSummary item={story} showText={false} />
 		</div>
 	{/each}
 

@@ -66,13 +66,18 @@
 
 {#if !errorMessage}
 	<div class="mb-8">
-		<ItemSummary item={parentItem} />
+		<ItemSummary item={parentItem} showText={true} />
 	</div>
 
-	{#each items as item (item.id)}
+	{#each items as item, i (item.id)}
 		<div class="dark:text-gray-300">
-			<ItemDetail {item} />
+			{#if i + 1 < items.length}
+				<ItemDetail {item} next={items[i + 1].id} nextAncestor={items[i + 1].id} />
+			{:else}
+				<ItemDetail {item} next={null} nextAncestor={null} />
+			{/if}
 		</div>
 	{/each}
+{:else}
+	<span>Error retrieving item: {errorMessage}</span>
 {/if}
-<span>Error retrieving item: {errorMessage}</span>
