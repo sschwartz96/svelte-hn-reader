@@ -47,6 +47,7 @@
 	import { fly } from 'svelte/transition';
 	import { tick } from 'svelte';
 	import { getItems } from '$lib/item';
+	import { sleep } from '$lib/util';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -56,10 +57,6 @@
 	let prevLength = 0;
 	let maxLength = 30;
 	let stories: Item[] = new Array<Item>();
-
-	const sleep = (milliseconds: number) => {
-		return new Promise((resolve) => setTimeout(resolve, milliseconds));
-	};
 
 	async function fetchItems() {
 		showMoreButton = false;

@@ -27,7 +27,6 @@ const itemStore: Record<number, Item> = {};
 export async function getItem(id: number): Promise<Item> {
 	const currentTime = (new Date()).getTime();
 	if (itemStore[id] && (currentTime - itemStore[id].lastUpdated) < 60000) {
-		console.log('item retrieved from store');
 		return itemStore[id];
 	}
 	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
