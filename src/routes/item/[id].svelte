@@ -13,7 +13,7 @@
 
 		// get parent item
 		try {
-			item = await getItem(id);
+			item = await getItem(id, true);
 		} catch (err) {
 			return {
 				props: {
@@ -45,6 +45,8 @@
 <script lang="ts">
 	import ItemDetail from '$lib/ItemDetail.svelte';
 	import ItemSummary from '$lib/ItemSummary.svelte';
+	import { sleep } from '$lib/util';
+	import { browser } from '$app/env';
 
 	let items: Item[] = new Array();
 
@@ -52,13 +54,22 @@
 	export let importedItems: Item[];
 	export let errorMessage: string;
 
-	const sleep = (milliseconds: number) => {
-		return new Promise((resolve) => setTimeout(resolve, milliseconds));
-	};
-
 	async function resetState(_items: Item[]) {
 		await sleep(10);
 		items = _items;
+	}
+
+	let finishCount = 0;
+	async function onFinish() {
+		finishCount++;
+		if (finishCount === parentItem.kids.length) {
+			if (browser && location.hash) {
+				await sleep(500); // need to wait for page to finish rendering
+				const element = document.getElementById(location.hash.substring(1));
+				element.scrollIntoView(true);
+				return;
+			}
+		}
 	}
 
 	$: resetState(importedItems);
@@ -72,9 +83,14 @@
 	{#each items as item, i (item.id)}
 		<div class="dark:text-gray-300">
 			{#if i + 1 < items.length}
-				<ItemDetail {item} next={items[i + 1].id} nextAncestor={items[i + 1].id} />
+				<ItemDetail
+					on:finish={onFinish}
+					{item}
+					next={items[i + 1].id}
+					nextAncestor={items[i + 1].id}
+				/>
 			{:else}
-				<ItemDetail {item} next={null} nextAncestor={null} />
+				<ItemDetail on:finish={onFinish} {item} next={null} nextAncestor={null} />
 			{/if}
 		</div>
 	{/each}

@@ -4,8 +4,6 @@
 
 	export let item: Item;
 	export let showText: boolean;
-
-	console.log(item.descendants);
 </script>
 
 <div class="wrapper" id={item.id.toString()}>
