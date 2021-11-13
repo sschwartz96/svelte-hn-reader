@@ -13,7 +13,7 @@ type Item = {
 	score: number; // The story's score, or the votes for a pollopt.
 	title: string; // The title of the story, poll or job. HTML.
 	parts: number[]; // A list of related pollopts, in display order.
-	descendants: number[]; // In the case of stories or polls, the total comment count.
+	descendants: number; // In the case of stories or polls, the total comment count.
 
 	// additional
 	lastUpdated: number; // last time the item was downloaded from API in milliseconds

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Item, getItems, getTotalDescendents } from './item';
-	import { getTimeAgo } from './util';
+	import { getTimeAgo, sleep } from './util';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
@@ -25,16 +25,20 @@
 	}
 
 	export let item: Item;
+	export let next: number; // next is the next item in the list
+	export let nextAncestor: number; // nextAncestor is the next "ancestor of the list" only null if we are at the bottom
 </script>
 
 <div id={item.id.toString()} class="mt-4" transition:slide={{ easing: sineInOut }}>
 	<div class="text-gray-500 dark:text-gray-400">
 		<span class="text-lg text-gray-500">&#8593;</span>
-
 		{item.by === undefined ? 'deleted' : item.by}
 		{getTimeAgo(item.time)}
 
 		<a href="#{item.parent}">parent</a>
+		{#if next !== null || nextAncestor !== null}
+			<a href="#{next ?? nextAncestor}">next</a>
+		{/if}
 		<button on:click={toggle}>[{expandText}]</button>
 	</div>
 
@@ -54,9 +58,14 @@
 	<div class="ml-8">
 		{#if children.length === 0}
 			<p>Loading...</p>
+		{:else}
+			{#each children as child, i (child.id)}
+				{#if i + 1 < children.length}
+					<svelte:self item={child} next={children[i + 1].id} nextAncestor={children[i + 1].id} />
+				{:else}
+					<svelte:self item={child} next={nextAncestor} {nextAncestor} />
+				{/if}
+			{/each}
 		{/if}
-		{#each children as child}
-			<svelte:self item={child} />
-		{/each}
 	</div>
 {/if}
