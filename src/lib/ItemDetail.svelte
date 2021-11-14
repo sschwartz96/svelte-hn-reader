@@ -53,7 +53,7 @@
 
 <div id={item.id.toString()} class="mt-4" transition:slide={{ easing: sineInOut }}>
 	<div class="text-gray-500 dark:text-gray-400">
-		<span class="text-lg text-gray-500">&#8593;</span>
+		<!-- <span class="text-lg text-gray-500">&#8593;</span> -->
 		{item.by === undefined ? 'deleted' : item.by}
 		{getTimeAgo(item.time)}
 

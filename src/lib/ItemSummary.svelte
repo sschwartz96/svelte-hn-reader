@@ -7,7 +7,7 @@
 </script>
 
 <div class="wrapper" id={item.id.toString()}>
-	<span class="text-lg text-gray-500">&#8593;</span>
+	<!-- <span class="text-lg text-gray-500">&#8593;</span> -->
 	<div class="flex flex-col space-x-0">
 		<div>
 			<a

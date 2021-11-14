@@ -5,7 +5,11 @@ const config = {
 	purge: ['./src/**/*.{html,js,svelte,ts}'],
 	darkMode: 'class',
 	theme: {
-		extend: {},
+		extend: {
+			minWidth: {
+				'2': '2rem',
+			}
+		},
 		colors: {
 			gray: colors.trueGray,
 			black: colors.black,
