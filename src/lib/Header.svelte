@@ -32,17 +32,17 @@
 </script>
 
 <header class="flex bg-green-400 dark:bg-green-800 dark:text-gray-300 p-1">
-	<h1 class="mr-4"><a sveltekit:prefetch sveltekit:noscroll href="/top">svelte-hn-reader</a></h1>
+	<h1 class="mr-4"><a sveltekit:prefetch href="/top">svelte-hn-reader</a></h1>
 	<nav class="flex flex-grow space-x-1">
-		<a sveltekit:prefetch sveltekit:noscroll href="/top">top</a> <span>|</span>
-		<a sveltekit:prefetch sveltekit:noscroll href="/newest">new</a><span>|</span>
+		<a sveltekit:prefetch href="/top">top</a> <span>|</span>
+		<a sveltekit:prefetch href="/newest">new</a><span>|</span>
 		<!--
 		<a href="/past">past</a> <span>|</span>
 		<a href="/newcomments">comments</a><span>|</span>
 		-->
-		<a sveltekit:prefetch sveltekit:noscroll href="/ask">ask</a> <span>|</span>
-		<a sveltekit:prefetch sveltekit:noscroll href="/show">show</a> <span>|</span>
-		<a sveltekit:prefetch sveltekit:noscroll href="/jobs">jobs</a>
+		<a sveltekit:prefetch href="/ask">ask</a> <span>|</span>
+		<a sveltekit:prefetch href="/show">show</a> <span>|</span>
+		<a sveltekit:prefetch href="/jobs">jobs</a>
 		<!--<a href="/submit">submit</a>-->
 		<div class="flex-grow" />
 		<button on:click={toggleTheme}>{themeText}</button>

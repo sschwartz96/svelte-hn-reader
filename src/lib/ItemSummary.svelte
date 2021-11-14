@@ -23,11 +23,9 @@
 			{item.score} points by {item.by}
 			{getTimeAgo(item.time)}
 			{#if item.kids}
-				| <a sveltekit:prefetch sveltekit:noscroll href="/item/{item.id}"
-					>{item.descendants} comments</a
-				>
+				| <a sveltekit:prefetch href="/item/{item.id}">{item.descendants} comments</a>
 			{:else}
-				| <a sveltekit:prefetch sveltekit:noscroll href="/item/{item.id}"> comments</a>
+				| <a sveltekit:prefetch href="/item/{item.id}"> comments</a>
 			{/if}
 		</div>
 		{#if showText && item.text}
@@ -37,9 +35,3 @@
 		{/if}
 	</div>
 </div>
-
-<style lang="postcss">
-	.wrapper {
-		@apply pt-1 flex space-x-1;
-	}
-</style>
