@@ -105,7 +105,7 @@
 			in:fly={{ x: 250, duration: 250 }}
 			out:fly={{ x: -250, duration: 250 }}
 		>
-			<span class="w-8 text-xl text-gray-400 text-right">{i + 1}.</span>
+			<span class="min-w-2 text-xl text-gray-400 text-right">{i + 1}.</span>
 			<ItemSummary item={story} showText={false} />
 		</div>
 	{/each}
