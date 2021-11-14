@@ -48,6 +48,7 @@
 	import { tick } from 'svelte';
 	import { getItems } from '$lib/item';
 	import { sleep } from '$lib/util';
+	import { browser } from '$app/env';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -57,22 +58,28 @@
 	let prevLength = 0;
 	let maxLength = 30;
 	let stories: Item[] = new Array<Item>();
+	let scrollY: number;
+	let fetching = false;
 
 	async function fetchItems() {
+		fetching = true;
 		showMoreButton = false;
 		const items = await getItems(storyIds.slice(prevLength, maxLength));
 		for (let i = 0; i < items.length; i++) {
 			await sleep(25);
 			stories = [...stories, items[i]];
 		}
+		fetching = false;
 		showMoreButton = true;
 	}
 
 	async function fetchMore() {
-		prevLength = maxLength;
-		maxLength += 30;
-		sleep(100);
-		fetchItems();
+		if (!fetching) {
+			prevLength = maxLength;
+			maxLength += 1;
+			sleep(100);
+			fetchItems();
+		}
 	}
 
 	// reset the state of the page based on the cateogry
@@ -90,17 +97,28 @@
 		fetchItems();
 	}
 
+	function checkScroll(y: number) {
+		if (!fetching && browser && stories.length > 0) {
+			const fifteenAway = document.getElementById(stories[stories.length - 16].id + '_scroll');
+			if (y > fifteenAway.offsetTop) fetchMore();
+		}
+	}
+
 	// use a reactive statement to update page based on "category"
 	$: resetState(category);
+	$: checkScroll(scrollY);
 </script>
 
-<div class="flex flex-col">
+<svelte:window bind:scrollY />
+
+<div class="flex flex-col overflow-x-hidden">
 	{#if errorMessage}
 		<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
 	{/if}
 
 	{#each stories as story, i}
 		<div
+			id="{story.id}_scroll"
 			class="flex space-x-2 items-baseline mb-2"
 			in:fly={{ x: 250, duration: 250 }}
 			out:fly={{ x: -250, duration: 250 }}
