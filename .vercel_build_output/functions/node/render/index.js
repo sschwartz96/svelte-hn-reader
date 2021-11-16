@@ -4696,16 +4696,16 @@ var init_shims = __esm({
   }
 });
 
-// .svelte-kit/output/server/chunks/__layout-945094a6.js
-var layout_945094a6_exports = {};
-__export(layout_945094a6_exports, {
+// .svelte-kit/output/server/chunks/__layout-33cf6d21.js
+var layout_33cf6d21_exports = {};
+__export(layout_33cf6d21_exports, {
   default: () => _layout
 });
 var Footer, Header, _layout;
-var init_layout_945094a6 = __esm({
-  ".svelte-kit/output/server/chunks/__layout-945094a6.js"() {
+var init_layout_33cf6d21 = __esm({
+  ".svelte-kit/output/server/chunks/__layout-33cf6d21.js"() {
     init_shims();
-    init_app_49bc2299();
+    init_app_e91271aa();
     Footer = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       return `<footer>This is the footer</footer>`;
     });
@@ -4734,9 +4734,9 @@ var init_layout_945094a6 = __esm({
   }
 });
 
-// .svelte-kit/output/server/chunks/error-60d60491.js
-var error_60d60491_exports = {};
-__export(error_60d60491_exports, {
+// .svelte-kit/output/server/chunks/error-9beb4094.js
+var error_9beb4094_exports = {};
+__export(error_9beb4094_exports, {
   default: () => Error2,
   load: () => load
 });
@@ -4744,10 +4744,10 @@ function load({ error: error2, status }) {
   return { props: { error: error2, status } };
 }
 var Error2;
-var init_error_60d60491 = __esm({
-  ".svelte-kit/output/server/chunks/error-60d60491.js"() {
+var init_error_9beb4094 = __esm({
+  ".svelte-kit/output/server/chunks/error-9beb4094.js"() {
     init_shims();
-    init_app_49bc2299();
+    init_app_e91271aa();
     Error2 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { status } = $$props;
       let { error: error2 } = $$props;
@@ -4767,9 +4767,9 @@ ${error2.stack ? `<pre>${escape(error2.stack)}</pre>` : ``}`;
   }
 });
 
-// .svelte-kit/output/server/chunks/index-0cc68743.js
-var index_0cc68743_exports = {};
-__export(index_0cc68743_exports, {
+// .svelte-kit/output/server/chunks/index-04e39b6a.js
+var index_04e39b6a_exports = {};
+__export(index_04e39b6a_exports, {
   default: () => Routes,
   load: () => load2
 });
@@ -4777,17 +4777,17 @@ async function load2() {
   return { status: 301, redirect: "/top" };
 }
 var Routes;
-var init_index_0cc68743 = __esm({
-  ".svelte-kit/output/server/chunks/index-0cc68743.js"() {
+var init_index_04e39b6a = __esm({
+  ".svelte-kit/output/server/chunks/index-04e39b6a.js"() {
     init_shims();
-    init_app_49bc2299();
+    init_app_e91271aa();
     Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       return ``;
     });
   }
 });
 
-// .svelte-kit/output/server/chunks/ItemSummary-b22373cc.js
+// .svelte-kit/output/server/chunks/ItemSummary-3e72518c.js
 async function getItem(id, invalidate) {
   const currentTime = new Date().getTime();
   if (itemStore[id] && (!invalidate || currentTime - itemStore[id].lastUpdated < 6e4)) {
@@ -4887,11 +4887,12 @@ function getTimeAgo(time) {
 function sleep(milliseconds) {
   return new Promise((resolve2) => setTimeout(resolve2, milliseconds));
 }
-var itemStore, ItemSummary;
-var init_ItemSummary_b22373cc = __esm({
-  ".svelte-kit/output/server/chunks/ItemSummary-b22373cc.js"() {
+var browser, itemStore, ItemSummary;
+var init_ItemSummary_3e72518c = __esm({
+  ".svelte-kit/output/server/chunks/ItemSummary-3e72518c.js"() {
     init_shims();
-    init_app_49bc2299();
+    init_app_e91271aa();
+    browser = false;
     itemStore = {};
     ItemSummary = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { item } = $$props;
@@ -4911,9 +4912,9 @@ var init_ItemSummary_b22373cc = __esm({
   }
 });
 
-// .svelte-kit/output/server/chunks/[id]-a2a06508.js
-var id_a2a06508_exports = {};
-__export(id_a2a06508_exports, {
+// .svelte-kit/output/server/chunks/[id]-0d7222e9.js
+var id_0d7222e9_exports = {};
+__export(id_0d7222e9_exports, {
   default: () => U5Bidu5D,
   load: () => load3
 });
@@ -4944,11 +4945,11 @@ async function load3({ page }) {
   };
 }
 var ItemDetail, U5Bidu5D;
-var init_id_a2a06508 = __esm({
-  ".svelte-kit/output/server/chunks/[id]-a2a06508.js"() {
+var init_id_0d7222e9 = __esm({
+  ".svelte-kit/output/server/chunks/[id]-0d7222e9.js"() {
     init_shims();
-    init_app_49bc2299();
-    init_ItemSummary_b22373cc();
+    init_app_e91271aa();
+    init_ItemSummary_3e72518c();
     ItemDetail = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       createEventDispatcher();
       let expandText = " - ";
@@ -4986,12 +4987,37 @@ ${item.kids ? `<div class="${"ml-8"}">${children.length === 0 ? `<p>Loading...</
     });
     U5Bidu5D = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let items = new Array();
+      let renderItems = new Array();
+      let rendering = false;
+      let scrollY = 0;
       let { parentItem } = $$props;
       let { importedItems } = $$props;
       let { errorMessage } = $$props;
       async function resetState(_items) {
         await sleep(10);
         items = _items;
+        initialRender();
+      }
+      async function checkScroll(y) {
+      }
+      async function initialRender() {
+        if (rendering)
+          return;
+        while (browser) {
+          rendering = true;
+          renderItems = [...renderItems, items[renderItems.length]];
+          let lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
+          let count = 0;
+          while (lastItem === null && count < 100) {
+            await sleep(50);
+            lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
+            count++;
+          }
+          if (lastItem.offsetTop > scrollY + window.innerHeight * 2) {
+            break;
+          }
+        }
+        rendering = false;
       }
       if ($$props.parentItem === void 0 && $$bindings.parentItem && parentItem !== void 0)
         $$bindings.parentItem(parentItem);
@@ -5002,9 +5028,14 @@ ${item.kids ? `<div class="${"ml-8"}">${children.length === 0 ? `<p>Loading...</
       {
         resetState(importedItems);
       }
-      return `${!errorMessage ? `<div class="${"mb-8"}">${validate_component(ItemSummary, "ItemSummary").$$render($$result, { item: parentItem, showText: true }, {}, {})}</div>
+      {
+        checkScroll();
+      }
+      return `
 
-	${each(items, (item, i) => `<div class="${"dark:text-gray-300"}">${i + 1 < items.length ? `${validate_component(ItemDetail, "ItemDetail").$$render($$result, {
+${!errorMessage ? `<div class="${"mb-8"}">${validate_component(ItemSummary, "ItemSummary").$$render($$result, { item: parentItem, showText: true }, {}, {})}</div>
+
+	${each(renderItems, (item, i) => `<div class="${"dark:text-gray-300"}">${i + 1 < items.length ? `${validate_component(ItemDetail, "ItemDetail").$$render($$result, {
         item,
         next: items[i + 1].id,
         nextAncestor: items[i + 1].id
@@ -5014,9 +5045,9 @@ ${item.kids ? `<div class="${"ml-8"}">${children.length === 0 ? `<p>Loading...</
   }
 });
 
-// .svelte-kit/output/server/chunks/[category]-99b50d8d.js
-var category_99b50d8d_exports = {};
-__export(category_99b50d8d_exports, {
+// .svelte-kit/output/server/chunks/[category]-24a1da5b.js
+var category_24a1da5b_exports = {};
+__export(category_24a1da5b_exports, {
   default: () => U5Bcategoryu5D,
   load: () => load4
 });
@@ -5048,13 +5079,12 @@ function determineCategory(category) {
       return "jobstories.json";
   }
 }
-var browser, U5Bcategoryu5D;
-var init_category_99b50d8d = __esm({
-  ".svelte-kit/output/server/chunks/[category]-99b50d8d.js"() {
+var U5Bcategoryu5D;
+var init_category_24a1da5b = __esm({
+  ".svelte-kit/output/server/chunks/[category]-24a1da5b.js"() {
     init_shims();
-    init_app_49bc2299();
-    init_ItemSummary_b22373cc();
-    browser = false;
+    init_app_e91271aa();
+    init_ItemSummary_3e72518c();
     U5Bcategoryu5D = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { category } = $$props;
       let { errorMessage = void 0 } = $$props;
@@ -5065,6 +5095,7 @@ var init_category_99b50d8d = __esm({
       let stories = new Array();
       let scrollY;
       let fetching = false;
+      let prevCateogry;
       async function fetchItems() {
         fetching = true;
         showMoreButton = false;
@@ -5076,15 +5107,20 @@ var init_category_99b50d8d = __esm({
         fetching = false;
         showMoreButton = true;
       }
-      async function fetchMore() {
+      async function fetchMore(amount) {
         if (!fetching) {
           prevLength = maxLength;
-          maxLength += 1;
+          maxLength += amount;
           sleep(100);
           fetchItems();
         }
       }
       async function resetState(category2) {
+        if (prevCateogry === category2) {
+          console.log("in the same category");
+          return;
+        }
+        category2 = category2;
         prevLength = 0;
         maxLength = 30;
         showMoreButton = false;
@@ -5098,7 +5134,7 @@ var init_category_99b50d8d = __esm({
         if (!fetching && browser && stories.length > 0) {
           const fifteenAway = document.getElementById(stories[stories.length - 16].id + "_scroll");
           if (y > fifteenAway.offsetTop)
-            fetchMore();
+            fetchMore(3);
         }
       }
       if ($$props.category === void 0 && $$bindings.category && category !== void 0)
@@ -5108,7 +5144,7 @@ var init_category_99b50d8d = __esm({
       if ($$props.storyIds === void 0 && $$bindings.storyIds && storyIds !== void 0)
         $$bindings.storyIds(storyIds);
       {
-        resetState();
+        resetState(category);
       }
       {
         checkScroll(scrollY);
@@ -5127,7 +5163,7 @@ var init_category_99b50d8d = __esm({
   }
 });
 
-// .svelte-kit/output/server/chunks/app-49bc2299.js
+// .svelte-kit/output/server/chunks/app-e91271aa.js
 function get_single_valued_header(headers, key) {
   const value = headers[key];
   if (Array.isArray(value)) {
@@ -6475,9 +6511,9 @@ function init(settings = default_settings) {
     amp: false,
     dev: false,
     entry: {
-      file: assets + "/_app/start-6f4c4c8b.js",
+      file: assets + "/_app/start-92c2ed88.js",
       css: [assets + "/_app/assets/start-464e9d0a.css"],
-      js: [assets + "/_app/start-6f4c4c8b.js", assets + "/_app/chunks/vendor-5b516324.js"]
+      js: [assets + "/_app/start-92c2ed88.js", assets + "/_app/chunks/vendor-1659fb7c.js"]
     },
     fetched: void 0,
     floc: false,
@@ -6521,8 +6557,8 @@ function render(request, {
   return respond({ ...request, host }, options, { prerender });
 }
 var __accessCheck, __privateGet, __privateAdd, __privateSet, _map, chars, unsafeChars, reserved, escaped$1, objectProtoOwnPropertyNames, subscriber_queue, escape_json_string_in_html_dict, escape_html_attr_dict, s$1, s, absolute, ReadOnlyFormData, current_component, dirty_components, binding_callbacks, render_callbacks, flush_callbacks, resolved_promise, update_scheduled, flushing, seen_callbacks, escaped, missing_component, on_destroy, css, Root, base, assets, user_hooks, template, options, default_settings, d, empty, manifest, get_hooks, module_lookup, metadata_lookup;
-var init_app_49bc2299 = __esm({
-  ".svelte-kit/output/server/chunks/app-49bc2299.js"() {
+var init_app_e91271aa = __esm({
+  ".svelte-kit/output/server/chunks/app-e91271aa.js"() {
     init_shims();
     __accessCheck = (obj, member, msg) => {
       if (!member.has(obj))
@@ -6752,13 +6788,13 @@ ${``}`;
       externalFetch: hooks.externalFetch || fetch
     });
     module_lookup = {
-      "src/routes/__layout.svelte": () => Promise.resolve().then(() => (init_layout_945094a6(), layout_945094a6_exports)),
-      ".svelte-kit/build/components/error.svelte": () => Promise.resolve().then(() => (init_error_60d60491(), error_60d60491_exports)),
-      "src/routes/index.svelte": () => Promise.resolve().then(() => (init_index_0cc68743(), index_0cc68743_exports)),
-      "src/routes/item/[id].svelte": () => Promise.resolve().then(() => (init_id_a2a06508(), id_a2a06508_exports)),
-      "src/routes/[category].svelte": () => Promise.resolve().then(() => (init_category_99b50d8d(), category_99b50d8d_exports))
+      "src/routes/__layout.svelte": () => Promise.resolve().then(() => (init_layout_33cf6d21(), layout_33cf6d21_exports)),
+      ".svelte-kit/build/components/error.svelte": () => Promise.resolve().then(() => (init_error_9beb4094(), error_9beb4094_exports)),
+      "src/routes/index.svelte": () => Promise.resolve().then(() => (init_index_04e39b6a(), index_04e39b6a_exports)),
+      "src/routes/item/[id].svelte": () => Promise.resolve().then(() => (init_id_0d7222e9(), id_0d7222e9_exports)),
+      "src/routes/[category].svelte": () => Promise.resolve().then(() => (init_category_24a1da5b(), category_24a1da5b_exports))
     };
-    metadata_lookup = { "src/routes/__layout.svelte": { "entry": "pages/__layout.svelte-9a78f295.js", "css": ["assets/pages/__layout.svelte-5f02d7b2.css"], "js": ["pages/__layout.svelte-9a78f295.js", "chunks/vendor-5b516324.js"], "styles": [] }, ".svelte-kit/build/components/error.svelte": { "entry": "error.svelte-bc13c7d8.js", "css": [], "js": ["error.svelte-bc13c7d8.js", "chunks/vendor-5b516324.js"], "styles": [] }, "src/routes/index.svelte": { "entry": "pages/index.svelte-b4e7611e.js", "css": [], "js": ["pages/index.svelte-b4e7611e.js", "chunks/vendor-5b516324.js"], "styles": [] }, "src/routes/item/[id].svelte": { "entry": "pages/item/[id].svelte-162b62a9.js", "css": [], "js": ["pages/item/[id].svelte-162b62a9.js", "chunks/vendor-5b516324.js", "chunks/ItemSummary-08328a07.js"], "styles": [] }, "src/routes/[category].svelte": { "entry": "pages/[category].svelte-92143dfe.js", "css": [], "js": ["pages/[category].svelte-92143dfe.js", "chunks/vendor-5b516324.js", "chunks/ItemSummary-08328a07.js"], "styles": [] } };
+    metadata_lookup = { "src/routes/__layout.svelte": { "entry": "pages/__layout.svelte-3b7513f3.js", "css": ["assets/pages/__layout.svelte-5f02d7b2.css"], "js": ["pages/__layout.svelte-3b7513f3.js", "chunks/vendor-1659fb7c.js"], "styles": [] }, ".svelte-kit/build/components/error.svelte": { "entry": "error.svelte-71ed75e7.js", "css": [], "js": ["error.svelte-71ed75e7.js", "chunks/vendor-1659fb7c.js"], "styles": [] }, "src/routes/index.svelte": { "entry": "pages/index.svelte-8ebfda89.js", "css": [], "js": ["pages/index.svelte-8ebfda89.js", "chunks/vendor-1659fb7c.js"], "styles": [] }, "src/routes/item/[id].svelte": { "entry": "pages/item/[id].svelte-22c5e17b.js", "css": [], "js": ["pages/item/[id].svelte-22c5e17b.js", "chunks/vendor-1659fb7c.js", "chunks/ItemSummary-b9e02421.js"], "styles": [] }, "src/routes/[category].svelte": { "entry": "pages/[category].svelte-bcf14736.js", "css": [], "js": ["pages/[category].svelte-bcf14736.js", "chunks/vendor-1659fb7c.js", "chunks/ItemSummary-b9e02421.js"], "styles": [] } };
   }
 });
 
@@ -6811,7 +6847,7 @@ function getRawBody(req) {
 
 // .svelte-kit/output/server/app.js
 init_shims();
-init_app_49bc2299();
+init_app_e91271aa();
 
 // .svelte-kit/vercel/entry.js
 init();
