@@ -29,6 +29,9 @@
 		descendentCount = await getTotalDescendents(item.id);
 		expanded = !expanded;
 		expandText = expandText === ' - ' ? descendentCount.toString() + ' more' : ' - ';
+
+		// need to dispatch this to its parent so we can load more comments if necessary
+		dispatch('toggled');
 	}
 
 	export let next: number; // next is the next item in the list
@@ -85,12 +88,19 @@
 				{#if i + 1 < children.length}
 					<svelte:self
 						on:finish={onFinish}
+						on:toggled={() => dispatch('toggled')}
 						item={child}
 						next={children[i + 1].id}
 						nextAncestor={children[i + 1].id}
 					/>
 				{:else}
-					<svelte:self on:finish={onFinish} item={child} next={nextAncestor} {nextAncestor} />
+					<svelte:self
+						on:finish={onFinish}
+						on:toggled={() => dispatch('toggled')}
+						item={child}
+						next={nextAncestor}
+						{nextAncestor}
+					/>
 				{/if}
 			{/each}
 		{/if}

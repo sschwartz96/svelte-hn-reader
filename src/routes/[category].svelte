@@ -60,6 +60,9 @@
 	let stories: Item[] = new Array<Item>();
 	let scrollY: number;
 	let fetching = false;
+	let prevCateogry: string;
+
+	if (prevCateogry === '') prevCateogry = category;
 
 	async function fetchItems() {
 		fetching = true;
@@ -73,10 +76,10 @@
 		showMoreButton = true;
 	}
 
-	async function fetchMore() {
+	async function fetchMore(amount: number) {
 		if (!fetching) {
 			prevLength = maxLength;
-			maxLength += 1;
+			maxLength += amount;
 			sleep(100);
 			fetchItems();
 		}
@@ -84,6 +87,10 @@
 
 	// reset the state of the page based on the cateogry
 	async function resetState(category: string) {
+		if (prevCateogry === category) {
+			console.log('in the same category');
+			return;
+		}
 		category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
@@ -100,7 +107,7 @@
 	function checkScroll(y: number) {
 		if (!fetching && browser && stories.length > 0) {
 			const fifteenAway = document.getElementById(stories[stories.length - 16].id + '_scroll');
-			if (y > fifteenAway.offsetTop) fetchMore();
+			if (y > fifteenAway.offsetTop) fetchMore(3);
 		}
 	}
 
@@ -130,6 +137,8 @@
 
 	<div class="flex-grow" />
 	{#if showMoreButton}
-		<button on:click={fetchMore} class="pt-2 pb-4 text-left text-gray-500">Load more...</button>
+		<button on:click={() => fetchMore(10)} class="pt-2 pb-4 text-left text-gray-500"
+			>Load more...</button
+		>
 	{/if}
 </div>

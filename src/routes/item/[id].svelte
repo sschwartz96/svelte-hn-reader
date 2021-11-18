@@ -47,8 +47,12 @@
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { sleep } from '$lib/util';
 	import { browser } from '$app/env';
+	import { tick } from 'svelte';
 
 	let items: Item[] = new Array();
+	let renderItems: Item[] = new Array();
+	let rendering = false;
+	let scrollY = 0;
 
 	export let parentItem: Item;
 	export let importedItems: Item[];
@@ -57,6 +61,7 @@
 	async function resetState(_items: Item[]) {
 		await sleep(10);
 		items = _items;
+		initialRender();
 	}
 
 	let finishCount = 0;
@@ -72,25 +77,72 @@
 		}
 	}
 
+	// checkScroll waits for slide transition to complete and then loads more comments if necessary
+	async function checkScroll(y: number) {
+		if (browser && renderItems.length > 0) {
+			await sleep(250);
+			await tick();
+			const lastRenderedComment = document.getElementById(
+				renderItems[renderItems.length - 1].id.toString()
+			);
+			if (
+				lastRenderedComment !== null &&
+				lastRenderedComment.offsetTop < y + window.innerHeight * 2
+			) {
+				initialRender();
+			}
+		}
+	}
+
+	// initialRender renders enough items to show on 2 * screen heights
+	async function initialRender() {
+		if (rendering) return;
+		while (browser && renderItems.length < items.length) {
+			rendering = true;
+			renderItems = [...renderItems, items[renderItems.length]];
+			let lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
+			let count = 0;
+			while (lastItem === null && count < 100) {
+				await sleep(50);
+				lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
+				count++;
+			}
+			if (lastItem.offsetTop > scrollY + window.innerHeight * 2) {
+				break;
+			}
+		}
+		rendering = false;
+	}
+
 	$: resetState(importedItems);
+	$: checkScroll(scrollY);
 </script>
+
+<svelte:window bind:scrollY />
 
 {#if !errorMessage}
 	<div class="mb-8">
 		<ItemSummary item={parentItem} showText={true} />
 	</div>
 
-	{#each items as item, i (item.id)}
+	{#each renderItems as item, i (item.id)}
 		<div class="dark:text-gray-300">
 			{#if i + 1 < items.length}
 				<ItemDetail
 					on:finish={onFinish}
+					on:toggled={() => checkScroll(scrollY)}
 					{item}
 					next={items[i + 1].id}
 					nextAncestor={items[i + 1].id}
 				/>
 			{:else}
-				<ItemDetail on:finish={onFinish} {item} next={null} nextAncestor={null} />
+				<ItemDetail
+					on:finish={onFinish}
+					on:toggled={() => checkScroll(scrollY)}
+					{item}
+					next={null}
+					nextAncestor={null}
+				/>
 			{/if}
 		</div>
 	{/each}
