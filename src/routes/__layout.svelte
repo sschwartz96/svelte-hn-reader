@@ -5,7 +5,7 @@
 	import '../app.css';
 </script>
 
-<div class="flex flex-col min-h-screen w-11/12 xl:w-10/12 mt-2 mx-auto">
+<div class="flex flex-col min-h-screen w-11/12 xl:w-10/12 py-4 mx-auto">
 	<Header />
 
 	<main class="flex-grow">
