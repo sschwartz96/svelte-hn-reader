@@ -39,3 +39,17 @@ export function sleep(milliseconds: number) {
 	return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+export function prettifyCategory(category: string): string {
+	switch (category) {
+		case 'topstories.json':
+			return 'Top Stories';
+		case 'newstories.json':
+			return 'New Stories';
+		case 'askstories.json':
+			return 'Ask';
+		case 'showstories.json':
+			return 'Show';
+		case 'jobstories.json':
+			return 'Jobs';
+	}
+}

@@ -120,6 +120,8 @@
 
 <svelte:window bind:scrollY />
 
+<title>{parentItem.title}</title>
+
 {#if !errorMessage}
 	<div class="mb-8">
 		<ItemSummary item={parentItem} showText={true} />

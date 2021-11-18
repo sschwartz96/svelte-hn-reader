@@ -47,7 +47,7 @@
 	import { fly } from 'svelte/transition';
 	import { tick } from 'svelte';
 	import { getItems } from '$lib/item';
-	import { sleep } from '$lib/util';
+	import { prettifyCategory, sleep } from '$lib/util';
 	import { browser } from '$app/env';
 
 	export let category: string;
@@ -117,6 +117,8 @@
 </script>
 
 <svelte:window bind:scrollY />
+
+<title>{prettifyCategory(category)}</title>
 
 <div class="flex flex-col overflow-x-hidden">
 	{#if errorMessage}
