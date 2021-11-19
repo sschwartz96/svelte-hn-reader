@@ -35,7 +35,7 @@
 
 <header class="flex items-center bg-green-400 dark:bg-green-800 dark:text-gray-300 p-1">
 	<h1 class="hidden">SvelteKit Hacker News Reader</h1>
-	<img src="/static/logo.png" alt="logo" class="p-0.5 mr-2 w-7 h-7" />
+	<img src="/logo.png" alt="logo" class="p-0.5 mr-2 w-7 h-7" />
 	<nav class="flex flex-grow space-x-1">
 		<a sveltekit:prefetch class={$page.params.category === 'top' ? 'selected' : ''} href="/top"
 			>top</a
