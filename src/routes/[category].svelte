@@ -69,7 +69,7 @@
 		showMoreButton = false;
 		const items = await getItems(storyIds.slice(prevLength, maxLength));
 		for (let i = 0; i < items.length; i++) {
-			await sleep(25);
+			/* await sleep(25); */
 			stories = [...stories, items[i]];
 		}
 		fetching = false;
@@ -80,7 +80,7 @@
 		if (!fetching) {
 			prevLength = maxLength;
 			maxLength += amount;
-			sleep(100);
+			/* sleep(100); */
 			fetchItems();
 		}
 	}
@@ -94,9 +94,9 @@
 
 		stories = new Array<Item>();
 		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
-		await sleep(100);
-		await tick();
-		await sleep(100);
+		/* await sleep(100); */
+		/* await tick(); */
+		/* await sleep(100); */
 		fetchItems();
 	}
 

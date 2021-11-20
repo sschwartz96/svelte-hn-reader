@@ -60,7 +60,7 @@
 	export let errorMessage: string;
 
 	async function resetState(_items: Item[]) {
-		await sleep(10);
+		/* await sleep(10); */
 		items = _items;
 		initialRender();
 	}
@@ -70,7 +70,7 @@
 		finishCount++;
 		if (finishCount === parentItem.kids.length) {
 			if (browser && location.hash) {
-				await sleep(500); // need to wait for page to finish rendering
+				/* await sleep(500); // need to wait for page to finish rendering */
 				const element = document.getElementById(location.hash.substring(1));
 				element.scrollIntoView(true);
 				return;
@@ -81,7 +81,7 @@
 	// checkScroll waits for slide transition to complete and then loads more comments if necessary
 	async function checkScroll(y: number) {
 		if (browser && renderItems.length > 0) {
-			await sleep(250);
+			/* await sleep(250); */
 			await tick();
 			const lastRenderedComment = document.getElementById(
 				renderItems[renderItems.length - 1].id.toString()
@@ -104,7 +104,8 @@
 			let lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
 			let count = 0;
 			while (lastItem === null && count < 100) {
-				await sleep(50);
+				/* await sleep(50); */
+				await tick();
 				lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
 				count++;
 			}
