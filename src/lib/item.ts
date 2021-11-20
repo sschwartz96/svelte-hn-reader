@@ -48,9 +48,9 @@ export async function getItem(id: number, invalidate: boolean): Promise<Item> {
 	const res = await fetch(url);
 	if (!res.ok) throw 'Error fetching data from API';
 
-	const item: Item = await res.json();
-	if (item === null) createNullItem(id, 0);
-	if (item === undefined) createUndefinedItem(id, 0);
+	let item: Item = await res.json();
+	if (item === null) item = createNullItem(id, 0);
+	if (item === undefined) item = createUndefinedItem(id, 0);
 	item.lastUpdated = currentTime;
 
 	itemStore[id] = item;
@@ -63,7 +63,7 @@ export async function getItems(ids: number[]): Promise<Item[]> {
 		const getItemFns = ids.map((val) => getItem(val, true));
 		return await Promise.all(getItemFns);
 	} catch (err) {
-		console.log('getItems() error');
+		console.log('getItems() error: ', err);
 	}
 	return [];
 }
@@ -85,7 +85,7 @@ export function createNullItem(id: number, index: number): Item {
 		parts: [],
 		parent: 0,
 		deleted: false,
-		descendants: [],
+		descendants: 0,
 		lastUpdated: (new Date()).getTime(),
 	};
 }
@@ -107,7 +107,7 @@ export function createUndefinedItem(id: number, index: number): Item {
 		parts: [],
 		parent: 0,
 		deleted: false,
-		descendants: [],
+		descendants: 0,
 		lastUpdated: (new Date()).getTime(),
 	};
 }

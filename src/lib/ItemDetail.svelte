@@ -20,7 +20,7 @@
 	}
 	/*** page load finish ***/
 
-	/*** for expansion and contraction of item ***/
+	/*** START expansion and contraction of item ***/
 	let expandText = ' - ';
 	let expanded = true;
 	let descendentCount = 0;
@@ -36,7 +36,7 @@
 
 	export let next: number; // next is the next item in the list
 	export let nextAncestor: number; // nextAncestor is the next "ancestor of the list" only null if we are at the bottom
-	/*** expansion and contraction ***/
+	/*** END expansion and contraction ***/
 
 	// basic functionality
 	let children: Item[] = new Array();
@@ -51,6 +51,24 @@
 			dispatch('finish');
 		}
 	});
+
+	// scrollToId scrolls to the item id and updates window history
+	function scrollToId(id: number) {
+		// update window history
+		let url = window.location.toString();
+		if (window.location.toString().includes('#')) {
+			url = url.split('#')[0];
+		}
+		window.history.pushState('', id.toString(), url + `#${id}`);
+
+		// find element and smooth scroll
+		const el = document.getElementById(id.toString());
+		if (el === null) {
+			console.log("this shouldn't happen");
+		}
+		window.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+	}
+
 	export let item: Item;
 </script>
 
@@ -60,9 +78,9 @@
 		{item.by === undefined ? 'deleted' : item.by}
 		{getTimeAgo(item.time)}
 
-		<a href="#{item.parent}">parent</a>
+		<button on:click={() => scrollToId(item.parent)}>parent</button>
 		{#if next !== null || nextAncestor !== null}
-			<a href="#{next ?? nextAncestor}">next</a>
+			<button on:click={() => scrollToId(next)}>next</button>
 		{/if}
 		<button on:click={toggle}>[{expandText}]</button>
 	</div>

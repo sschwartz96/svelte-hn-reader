@@ -48,7 +48,7 @@
 <script lang="ts">
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { fly, fade } from 'svelte/transition';
-	import { tick } from 'svelte';
+	import { tick, onMount } from 'svelte';
 	import { getItems } from '$lib/item';
 	import { prettifyCategory, sleep } from '$lib/util';
 	import { browser } from '$app/env';
@@ -64,6 +64,13 @@
 	let stories: Item[] = new Array<Item>();
 	let scrollY: number;
 	let fetching = false;
+	let mounted = false;
+
+	// ran everytime we navigate to a category
+	onMount(async () => {
+		await sleep(250);
+		mounted = true;
+	});
 
 	async function fetchItems() {
 		fetching = true;
@@ -78,7 +85,7 @@
 	}
 
 	async function fetchMore(amount: number) {
-		if (!fetching) {
+		if (!fetching && mounted) {
 			prevLength = maxLength;
 			maxLength += amount;
 			/* sleep(100); */
@@ -91,7 +98,6 @@
 		if ($currentCategory === category) {
 			storyIds = $currentCategoryItemIds;
 			stories = $currentCategoryItems;
-			console.log('we already have items! using cache');
 			return;
 		}
 		$currentCategoryItemIds = storyIds;

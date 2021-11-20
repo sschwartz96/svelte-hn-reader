@@ -48,16 +48,19 @@
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { sleep } from '$lib/util';
 	import { browser } from '$app/env';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	let items: Item[] = new Array();
 	let renderItems: Item[] = new Array();
 	let rendering = false;
 	let scrollY = 0;
+	let alreadyScrolled = false;
 
 	export let parentItem: Item;
 	export let importedItems: Item[];
 	export let errorMessage: string;
+
+	onMount(async () => await sleep(10));
 
 	async function resetState(_items: Item[]) {
 		/* await sleep(10); */
@@ -68,11 +71,17 @@
 	let finishCount = 0;
 	async function onFinish() {
 		finishCount++;
-		if (finishCount === parentItem.kids.length) {
+		if (!alreadyScrolled && finishCount === renderItems.length) {
 			if (browser && location.hash) {
-				/* await sleep(500); // need to wait for page to finish rendering */
-				const element = document.getElementById(location.hash.substring(1));
-				element.scrollIntoView(true);
+				await sleep(250); // initial wait for the first few comments to load
+				let element = document.getElementById(location.hash.substring(1));
+				while (element === null) {
+					await sleep(100);
+					element = document.getElementById(location.hash.substring(1));
+					await loadNextItem();
+				}
+				alreadyScrolled = true;
+				element.scrollIntoView(true); // TODO: manually set smooth here
 				return;
 			}
 		}
@@ -116,6 +125,11 @@
 		rendering = false;
 	}
 
+	async function loadNextItem() {
+		rendering = true;
+		renderItems = [...renderItems, items[renderItems.length]];
+	}
+
 	$: resetState(importedItems);
 	$: checkScroll(scrollY);
 </script>
@@ -125,31 +139,33 @@
 <title>{parentItem.title}</title>
 
 {#if !errorMessage}
-	<div class="mb-8">
-		<ItemSummary item={parentItem} showText={true} />
-	</div>
-
-	{#each renderItems as item, i (item.id)}
-		<div class="dark:text-gray-300">
-			{#if i + 1 < items.length}
-				<ItemDetail
-					on:finish={onFinish}
-					on:toggled={() => checkScroll(scrollY)}
-					{item}
-					next={items[i + 1].id}
-					nextAncestor={items[i + 1].id}
-				/>
-			{:else}
-				<ItemDetail
-					on:finish={onFinish}
-					on:toggled={() => checkScroll(scrollY)}
-					{item}
-					next={null}
-					nextAncestor={null}
-				/>
-			{/if}
+	<div class="smoothScroll">
+		<div class="mb-8">
+			<ItemSummary item={parentItem} showText={true} />
 		</div>
-	{/each}
+
+		{#each renderItems as item, i (item.id)}
+			<div class="dark:text-gray-300">
+				{#if i + 1 < items.length}
+					<ItemDetail
+						on:finish={onFinish}
+						on:toggled={() => checkScroll(scrollY)}
+						{item}
+						next={items[i + 1].id}
+						nextAncestor={items[i + 1].id}
+					/>
+				{:else}
+					<ItemDetail
+						on:finish={onFinish}
+						on:toggled={() => checkScroll(scrollY)}
+						{item}
+						next={null}
+						nextAncestor={null}
+					/>
+				{/if}
+			</div>
+		{/each}
+	</div>
 {:else}
 	<span>Error retrieving item: {errorMessage}</span>
 {/if}
