@@ -52,6 +52,7 @@
 	import { getItems } from '$lib/item';
 	import { prettifyCategory, sleep } from '$lib/util';
 	import { browser } from '$app/env';
+	import { currentCategory, currentCategoryItemIds, currentCategoryItems } from '$lib/stores';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -70,7 +71,7 @@
 		const items = await getItems(storyIds.slice(prevLength, maxLength));
 		for (let i = 0; i < items.length; i++) {
 			/* await sleep(25); */
-			stories = [...stories, items[i]];
+			$currentCategoryItems = stories = [...stories, items[i]];
 		}
 		fetching = false;
 		showMoreButton = true;
@@ -87,7 +88,14 @@
 
 	// reset the state of the page based on the cateogry
 	async function resetState(category: string) {
-		category = category; // just to prevent linter complain
+		if ($currentCategory === category) {
+			storyIds = $currentCategoryItemIds;
+			stories = $currentCategoryItems;
+			console.log('we already have items! using cache');
+			return;
+		}
+		$currentCategoryItemIds = storyIds;
+		$currentCategory = category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
 		showMoreButton = false; // hide while loading
@@ -103,7 +111,7 @@
 	function checkScroll(y: number) {
 		if (!fetching && browser && stories.length > 0) {
 			const fifteenAway = document.getElementById(stories[stories.length - 16].id + '_scroll');
-			if (y > fifteenAway.offsetTop) fetchMore(3);
+			if (fifteenAway !== null && y > fifteenAway.offsetTop) fetchMore(3);
 		}
 	}
 
