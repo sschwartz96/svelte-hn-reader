@@ -36,7 +36,8 @@
 		return {
 			props: {
 				parentItem: item,
-				importedItems: items
+				importedItems: items,
+				errorMessage: ''
 			}
 		};
 	}

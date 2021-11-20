@@ -54,7 +54,7 @@
 	export let item: Item;
 </script>
 
-<div id={item.id.toString()} class="mt-4" transition:slide={{ easing: sineInOut }}>
+<div id={item.id.toString()} class="mt-4">
 	<div class="text-gray-500 dark:text-gray-400">
 		<!-- <span class="text-lg text-gray-500">&#8593;</span> -->
 		{item.by === undefined ? 'deleted' : item.by}
@@ -68,7 +68,7 @@
 	</div>
 
 	{#if expanded}
-		<p transition:slide|local class="max-w-4xl">
+		<p class="max-w-4xl">
 			{@html item.text === undefined ? 'deleted' : item.text}
 		</p>
 	{/if}

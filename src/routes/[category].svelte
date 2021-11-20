@@ -12,6 +12,8 @@
 		if (!res.ok) {
 			return {
 				props: {
+					storyIds: [],
+					category: category,
 					errorMessage: 'Failed to retrieve data from API'
 				}
 			};
@@ -21,7 +23,8 @@
 		return {
 			props: {
 				storyIds: ids,
-				category: category
+				category: category,
+				errorMessage: ''
 			}
 		};
 	}
@@ -44,7 +47,7 @@
 
 <script lang="ts">
 	import ItemSummary from '$lib/ItemSummary.svelte';
-	import { fly } from 'svelte/transition';
+	import { fly, fade } from 'svelte/transition';
 	import { tick } from 'svelte';
 	import { getItems } from '$lib/item';
 	import { prettifyCategory, sleep } from '$lib/util';
@@ -60,9 +63,6 @@
 	let stories: Item[] = new Array<Item>();
 	let scrollY: number;
 	let fetching = false;
-	let prevCateogry: string;
-
-	if (prevCateogry === '') prevCateogry = category;
 
 	async function fetchItems() {
 		fetching = true;
@@ -87,10 +87,6 @@
 
 	// reset the state of the page based on the cateogry
 	async function resetState(category: string) {
-		if (prevCateogry === category) {
-			console.log('in the same category');
-			return;
-		}
 		category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
@@ -126,12 +122,7 @@
 	{/if}
 
 	{#each stories as story, i}
-		<div
-			id="{story.id}_scroll"
-			class="flex space-x-2 items-baseline mb-2"
-			in:fly={{ x: 250, duration: 250 }}
-			out:fly={{ x: -250, duration: 250 }}
-		>
+		<div id="{story.id}_scroll" class="flex space-x-2 items-baseline mb-2">
 			<span class="min-w-2 text-xl text-gray-400 text-right">{i + 1}.</span>
 			<ItemSummary item={story} showText={false} />
 		</div>
