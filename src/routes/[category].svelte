@@ -48,7 +48,7 @@
 <script lang="ts">
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { fly, fade } from 'svelte/transition';
-	import { tick, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { getItems } from '$lib/item';
 	import { prettifyCategory, sleep } from '$lib/util';
 	import { browser } from '$app/env';

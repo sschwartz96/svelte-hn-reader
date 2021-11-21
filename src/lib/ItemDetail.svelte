@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { Item, getItems, getTotalDescendents } from './item';
-	import { getTimeAgo } from './util';
+	import { getTimeAgo, sleep } from './util';
 	import { onMount } from 'svelte';
-	import { slide } from 'svelte/transition';
-	import { sineInOut } from 'svelte/easing';
 	import { createEventDispatcher } from 'svelte';
 
 	/*** for page load finish ***/
@@ -24,14 +22,30 @@
 	let expandText = ' - ';
 	let expanded = true;
 	let descendentCount = 0;
+	let childrenElem: HTMLElement;
+	let childrenElemInitialHeight: string;
 
 	async function toggle() {
-		descendentCount = await getTotalDescendents(item.id);
+		getTotalDescendents(item.id).then((amount) => {
+			descendentCount = amount;
+			expandText = expandText === ' - ' ? descendentCount.toString() + ' more' : ' - ';
+		});
 		expanded = !expanded;
-		expandText = expandText === ' - ' ? descendentCount.toString() + ' more' : ' - ';
 
 		// need to dispatch this to its parent so we can load more comments if necessary
 		dispatch('toggled');
+
+		if (!expanded) {
+			if (!childrenElemInitialHeight)
+				childrenElemInitialHeight = childrenElem.offsetHeight.toString() + 'px';
+			childrenElem.style.height = childrenElemInitialHeight;
+			await sleep(10);
+			childrenElem.style.height = '0';
+		} else {
+			childrenElem.style.height = childrenElemInitialHeight;
+			await sleep(250);
+			childrenElem.style.height = 'auto';
+		}
 	}
 
 	export let next: number; // next is the next item in the list
@@ -39,7 +53,7 @@
 	/*** END expansion and contraction ***/
 
 	// basic functionality
-	let children: Item[] = new Array();
+	let children: Item[] = [];
 
 	onMount(async () => {
 		if (item.kids && item.kids.length > 0) {
@@ -84,12 +98,6 @@
 		{/if}
 		<button on:click={toggle}>[{expandText}]</button>
 	</div>
-
-	{#if expanded}
-		<p class="max-w-4xl">
-			{@html item.text === undefined ? 'deleted' : item.text}
-		</p>
-	{/if}
 </div>
 
 <!-- 
@@ -97,30 +105,43 @@
 ---- same container as the content. Breaks the slide transition!
 --->
 
-{#if expanded && item.kids}
-	<div class="ml-8">
-		{#if children.length === 0}
-			<p>Loading...</p>
-		{:else}
-			{#each children as child, i (child.id)}
-				{#if i + 1 < children.length}
-					<svelte:self
-						on:finish={onFinish}
-						on:toggled={() => dispatch('toggled')}
-						item={child}
-						next={children[i + 1].id}
-						nextAncestor={children[i + 1].id}
-					/>
-				{:else}
-					<svelte:self
-						on:finish={onFinish}
-						on:toggled={() => dispatch('toggled')}
-						item={child}
-						next={nextAncestor}
-						{nextAncestor}
-					/>
-				{/if}
-			{/each}
-		{/if}
-	</div>
-{/if}
+<div bind:this={childrenElem} class="children">
+	<p class="max-w-4xl">
+		{@html item.text === undefined ? 'deleted' : item.text}
+	</p>
+
+	{#if item.kids}
+		<div class="ml-8">
+			{#if children.length === 0}
+				<p>Loading...</p>
+			{:else}
+				{#each children as child, i (child.id)}
+					{#if i + 1 < children.length}
+						<svelte:self
+							on:finish={onFinish}
+							on:toggled={() => dispatch('toggled')}
+							item={child}
+							next={children[i + 1].id}
+							nextAncestor={children[i + 1].id}
+						/>
+					{:else}
+						<svelte:self
+							on:finish={onFinish}
+							on:toggled={() => dispatch('toggled')}
+							item={child}
+							next={nextAncestor}
+							{nextAncestor}
+						/>
+					{/if}
+				{/each}
+			{/if}
+		</div>
+	{/if}
+</div>
+
+<style>
+	.children {
+		transition: height 0.3s ease-in-out;
+		overflow: hidden;
+	}
+</style>

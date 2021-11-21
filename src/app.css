@@ -2,10 +2,10 @@
 @tailwind base;
 
 html {
-  /* scroll-behavior: smooth; */
+	/* scroll-behavior: smooth; */
 }
 body {
-	@apply dark:bg-gray-800 dark:text-gray-400 ;
+	@apply dark:bg-gray-800 dark:text-gray-400;
 	transition-property: background-color, border-color, color, fill, stroke;
 	transition-duration: 500ms;
 }

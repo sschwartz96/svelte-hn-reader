@@ -50,8 +50,8 @@
 	import { browser } from '$app/env';
 	import { onMount, tick } from 'svelte';
 
-	let items: Item[] = new Array();
-	let renderItems: Item[] = new Array();
+	let items: Item[] = [];
+	let renderItems: Item[] = [];
 	let rendering = false;
 	let scrollY = 0;
 	let alreadyScrolled = false;

@@ -40,8 +40,8 @@ export async function getTotalDescendents(id: number): Promise<number> {
 // caches for 1 minute
 // invalidate ignores the cache limit
 export async function getItem(id: number, invalidate: boolean): Promise<Item> {
-	const currentTime = (new Date()).getTime();
-	if (itemStore[id] && (!invalidate || (currentTime - itemStore[id].lastUpdated) < 60000)) {
+	const currentTime = new Date().getTime();
+	if (itemStore[id] && (!invalidate || currentTime - itemStore[id].lastUpdated < 60000)) {
 		return itemStore[id];
 	}
 	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
@@ -86,7 +86,7 @@ export function createNullItem(id: number, index: number): Item {
 		parent: 0,
 		deleted: false,
 		descendants: 0,
-		lastUpdated: (new Date()).getTime(),
+		lastUpdated: new Date().getTime()
 	};
 }
 
@@ -108,6 +108,6 @@ export function createUndefinedItem(id: number, index: number): Item {
 		parent: 0,
 		deleted: false,
 		descendants: 0,
-		lastUpdated: (new Date()).getTime(),
+		lastUpdated: new Date().getTime()
 	};
 }
