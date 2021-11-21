@@ -36,8 +36,9 @@
 		dispatch('toggled');
 
 		if (!expanded) {
-			if (!childrenElemInitialHeight)
-				childrenElemInitialHeight = childrenElem.offsetHeight.toString() + 'px';
+			// update height each time to ensure proper height if children are collapse
+			childrenElemInitialHeight = childrenElem.offsetHeight.toString() + 'px';
+			await sleep(10);
 			childrenElem.style.height = childrenElemInitialHeight;
 			await sleep(10);
 			childrenElem.style.height = '0';
