@@ -21,11 +21,14 @@
 	/*** START expansion and contraction of item ***/
 	let expandText = ' - ';
 	let expanded = true;
+	let expanding = false;
 	let descendentCount = 0;
 	let childrenElem: HTMLElement;
 	let childrenElemInitialHeight: string;
 
 	async function toggle() {
+		if (expanding) return;
+		expanding = true;
 		getTotalDescendents(item.id).then((amount) => {
 			descendentCount = amount;
 			expandText = expandText === ' - ' ? descendentCount.toString() + ' more' : ' - ';
@@ -38,15 +41,20 @@
 		if (!expanded) {
 			// update height each time to ensure proper height if children are collapse
 			childrenElemInitialHeight = childrenElem.offsetHeight.toString() + 'px';
+			childrenElem.style.transitionTimingFunction = 'cubic-bezier(0, 0, 0.10, 1.0)';
 			await sleep(10);
 			childrenElem.style.height = childrenElemInitialHeight;
 			await sleep(10);
 			childrenElem.style.height = '0';
+			await sleep(300);
 		} else {
+			childrenElem.style.transitionTimingFunction = 'cubic-bezier(0.90, 0, 1.0, 1.0)';
+			await sleep(10);
 			childrenElem.style.height = childrenElemInitialHeight;
-			await sleep(250);
+			await sleep(300);
 			childrenElem.style.height = 'auto';
 		}
+		expanding = false;
 	}
 
 	export let next: number; // next is the next item in the list
