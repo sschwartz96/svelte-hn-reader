@@ -49,6 +49,7 @@
 	import { sleep } from '$lib/util';
 	import { browser } from '$app/env';
 	import { onMount, tick } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	let items: Item[] = [];
 	let renderItems: Item[] = [];
@@ -89,9 +90,9 @@
 
 	// checkScroll waits for slide transition to complete and then loads more comments if necessary
 	async function checkScroll(y: number) {
-		if (browser && renderItems.length > 0) {
-			/* await sleep(250); */
-			await tick();
+		if (browser && !rendering && renderItems.length > 0) {
+			console.log('checking scroll');
+			await sleep(300); // must wait for animation to  be performed
 			const lastRenderedComment = document.getElementById(
 				renderItems[renderItems.length - 1].id.toString()
 			);
@@ -113,12 +114,15 @@
 			let lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
 			let count = 0;
 			while (lastItem === null && count < 100) {
-				/* await sleep(50); */
-				await tick();
 				lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
+				await sleep(100);
 				count++;
 			}
+			await sleep(100);
 			if (lastItem.offsetTop > scrollY + window.innerHeight * 2) {
+				console.log(renderItems[renderItems.length - 1].id.toString());
+				console.log('lastItem top position is greater than window height');
+				console.log(`${lastItem.offsetTop} > ${scrollY} + ${window.innerHeight} * 2`);
 				break;
 			}
 		}
@@ -144,7 +148,7 @@
 	</div>
 
 	{#each renderItems as item, i (item.id)}
-		<div class="dark:text-gray-300">
+		<div transition:fade|local class="dark:text-gray-300">
 			{#if i + 1 < items.length}
 				<ItemDetail
 					on:finish={onFinish}
