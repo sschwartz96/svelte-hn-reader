@@ -130,13 +130,17 @@
 
 <title>{prettifyCategory(category)}</title>
 
-<div class="flex flex-col overflow-x-hidden">
+<div out:fade|local={{ duration: 250 }} class="flex flex-col overflow-x-hidden">
 	{#if errorMessage}
 		<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
 	{/if}
 
 	{#each stories as story, i}
-		<div id="{story.id}_scroll" class="flex space-x-2 items-baseline mb-2">
+		<div
+			in:fly|local={{ x: 100 }}
+			id="{story.id}_scroll"
+			class="flex space-x-2 items-baseline mb-2"
+		>
 			<span class="min-w-2 text-xl text-gray-400 text-right">{i + 1}.</span>
 			<ItemSummary item={story} showText={false} />
 		</div>

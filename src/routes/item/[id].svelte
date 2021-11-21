@@ -139,33 +139,31 @@
 <title>{parentItem.title}</title>
 
 {#if !errorMessage}
-	<div class="smoothScroll">
-		<div class="mb-8">
-			<ItemSummary item={parentItem} showText={true} />
-		</div>
-
-		{#each renderItems as item, i (item.id)}
-			<div class="dark:text-gray-300">
-				{#if i + 1 < items.length}
-					<ItemDetail
-						on:finish={onFinish}
-						on:toggled={() => checkScroll(scrollY)}
-						{item}
-						next={items[i + 1].id}
-						nextAncestor={items[i + 1].id}
-					/>
-				{:else}
-					<ItemDetail
-						on:finish={onFinish}
-						on:toggled={() => checkScroll(scrollY)}
-						{item}
-						next={null}
-						nextAncestor={null}
-					/>
-				{/if}
-			</div>
-		{/each}
+	<div class="mb-8">
+		<ItemSummary item={parentItem} showText={true} />
 	</div>
+
+	{#each renderItems as item, i (item.id)}
+		<div class="dark:text-gray-300">
+			{#if i + 1 < items.length}
+				<ItemDetail
+					on:finish={onFinish}
+					on:toggled={() => checkScroll(scrollY)}
+					{item}
+					next={items[i + 1].id}
+					nextAncestor={items[i + 1].id}
+				/>
+			{:else}
+				<ItemDetail
+					on:finish={onFinish}
+					on:toggled={() => checkScroll(scrollY)}
+					{item}
+					next={null}
+					nextAncestor={null}
+				/>
+			{/if}
+		</div>
+	{/each}
 {:else}
 	<span>Error retrieving item: {errorMessage}</span>
 {/if}
