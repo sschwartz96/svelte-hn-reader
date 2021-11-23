@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import type { Item } from '$lib/item';
+	import { getItem, Item } from '$lib/item';
 
 	/**
 	 * @type {import('@sveltejs/kit').Load}
@@ -12,6 +12,8 @@
 		if (!res.ok) {
 			return {
 				props: {
+					storyIds: [],
+					category: category,
 					errorMessage: 'Failed to retrieve data from API'
 				}
 			};
@@ -21,7 +23,8 @@
 		return {
 			props: {
 				storyIds: ids,
-				category: category
+				category: category,
+				errorMessage: ''
 			}
 		};
 	}
@@ -44,11 +47,11 @@
 
 <script lang="ts">
 	import ItemSummary from '$lib/ItemSummary.svelte';
-	import { fly } from 'svelte/transition';
-	import { tick } from 'svelte';
-	import { getItems } from '$lib/item';
+	import { fly, fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
 	import { prettifyCategory, sleep } from '$lib/util';
 	import { browser } from '$app/env';
+	import { currentCategory, currentCategoryItemIds, currentCategoryItems } from '$lib/stores';
 
 	export let category: string;
 	export let errorMessage = undefined;
@@ -60,54 +63,63 @@
 	let stories: Item[] = new Array<Item>();
 	let scrollY: number;
 	let fetching = false;
-	let prevCateogry: string;
+	let mounted = false;
+	let capped = false; // capped only set to true if we are at the end of the storyIds length
 
-	if (prevCateogry === '') prevCateogry = category;
+	// ran everytime we navigate to a category
+	onMount(async () => {
+		await sleep(250);
+		mounted = true;
+	});
 
 	async function fetchItems() {
 		fetching = true;
 		showMoreButton = false;
-		const items = await getItems(storyIds.slice(prevLength, maxLength));
-		for (let i = 0; i < items.length; i++) {
-			await sleep(25);
-			stories = [...stories, items[i]];
+		for (let i = 0; i < maxLength - prevLength; i++) {
+			const index = prevLength + i;
+			const item = await getItem(storyIds[index], true);
+			await sleep(10);
+			$currentCategoryItems = stories = [...stories, item];
 		}
 		fetching = false;
 		showMoreButton = true;
 	}
 
 	async function fetchMore(amount: number) {
-		if (!fetching) {
-			prevLength = maxLength;
-			maxLength += amount;
-			sleep(100);
+		if (!fetching && !capped && mounted) {
+			if (maxLength + amount > storyIds.length) {
+				prevLength = maxLength;
+				maxLength = storyIds.length;
+				capped = true;
+			} else {
+				prevLength = maxLength;
+				maxLength += amount;
+			}
 			fetchItems();
 		}
 	}
 
 	// reset the state of the page based on the cateogry
 	async function resetState(category: string) {
-		if (prevCateogry === category) {
-			console.log('in the same category');
+		if ($currentCategory === category) {
+			storyIds = $currentCategoryItemIds;
+			stories = $currentCategoryItems;
 			return;
 		}
-		category = category; // just to prevent linter complain
+		$currentCategoryItemIds = storyIds;
+		$currentCategory = category = category; // just to prevent linter complain
 		prevLength = 0;
 		maxLength = 30;
 		showMoreButton = false; // hide while loading
 
 		stories = new Array<Item>();
-		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
-		await sleep(100);
-		await tick();
-		await sleep(100);
 		fetchItems();
 	}
 
 	function checkScroll(y: number) {
 		if (!fetching && browser && stories.length > 0) {
 			const fifteenAway = document.getElementById(stories[stories.length - 16].id + '_scroll');
-			if (y > fifteenAway.offsetTop) fetchMore(3);
+			if (fifteenAway !== null && y > fifteenAway.offsetTop) fetchMore(3);
 		}
 	}
 
@@ -120,17 +132,16 @@
 
 <title>{prettifyCategory(category)}</title>
 
-<div class="flex flex-col overflow-x-hidden">
+<div out:fade|local={{ duration: 250 }} class="flex flex-col overflow-x-hidden">
 	{#if errorMessage}
 		<div class="font-bold text-2xl text-red-800">{errorMessage}</div>
 	{/if}
 
 	{#each stories as story, i}
 		<div
+			in:fly|local={{ x: 50, duration: 500 }}
 			id="{story.id}_scroll"
 			class="flex space-x-2 items-baseline mb-2"
-			in:fly={{ x: 250, duration: 250 }}
-			out:fly={{ x: -250, duration: 250 }}
 		>
 			<span class="min-w-2 text-xl text-gray-400 text-right">{i + 1}.</span>
 			<ItemSummary item={story} showText={false} />

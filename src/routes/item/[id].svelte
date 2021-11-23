@@ -9,7 +9,7 @@
 		const id: number = page.params.id;
 		/* const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`; */
 		let item: Item;
-		let items: Item[];
+		let items: Item[] = [];
 
 		// get parent item
 		try {
@@ -23,20 +23,22 @@
 		}
 
 		// get all children
-		try {
-			items = await getItems(item.kids);
-		} catch (err) {
-			return {
-				props: {
-					errorMessage: 'Failed to retrieve data from API'
-				}
-			};
+		if (item.kids && item.kids.length > 0) {
+			try {
+				items = await getItems(item.kids);
+			} catch (err) {
+				return {
+					props: {
+						errorMessage: 'Failed to retrieve data from API'
+					}
+				};
+			}
 		}
-
 		return {
 			props: {
 				parentItem: item,
-				importedItems: items
+				importedItems: items,
+				errorMessage: ''
 			}
 		};
 	}
@@ -47,19 +49,23 @@
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { sleep } from '$lib/util';
 	import { browser } from '$app/env';
-	import { tick } from 'svelte';
+	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
-	let items: Item[] = new Array();
-	let renderItems: Item[] = new Array();
+	let items: Item[] = [];
+	let renderItems: Item[] = [];
 	let rendering = false;
 	let scrollY = 0;
+	let alreadyScrolled = false;
 
 	export let parentItem: Item;
 	export let importedItems: Item[];
 	export let errorMessage: string;
 
+	onMount(async () => await sleep(10));
+
 	async function resetState(_items: Item[]) {
-		await sleep(10);
+		/* await sleep(10); */
 		items = _items;
 		initialRender();
 	}
@@ -67,11 +73,17 @@
 	let finishCount = 0;
 	async function onFinish() {
 		finishCount++;
-		if (finishCount === parentItem.kids.length) {
+		if (!alreadyScrolled && finishCount === renderItems.length) {
 			if (browser && location.hash) {
-				await sleep(500); // need to wait for page to finish rendering
-				const element = document.getElementById(location.hash.substring(1));
-				element.scrollIntoView(true);
+				await sleep(250); // initial wait for the first few comments to load
+				let element = document.getElementById(location.hash.substring(1));
+				while (element === null) {
+					await sleep(100);
+					element = document.getElementById(location.hash.substring(1));
+					await loadNextItem();
+				}
+				alreadyScrolled = true;
+				element.scrollIntoView(true); // TODO: manually set smooth here
 				return;
 			}
 		}
@@ -79,9 +91,8 @@
 
 	// checkScroll waits for slide transition to complete and then loads more comments if necessary
 	async function checkScroll(y: number) {
-		if (browser && renderItems.length > 0) {
-			await sleep(250);
-			await tick();
+		if (browser && !rendering && renderItems.length > 0) {
+			await sleep(300); // must wait for animation to  be performed
 			const lastRenderedComment = document.getElementById(
 				renderItems[renderItems.length - 1].id.toString()
 			);
@@ -103,15 +114,21 @@
 			let lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
 			let count = 0;
 			while (lastItem === null && count < 100) {
-				await sleep(50);
 				lastItem = document.getElementById(renderItems[renderItems.length - 1].id.toString());
+				await sleep(100);
 				count++;
 			}
-			if (lastItem.offsetTop > scrollY + window.innerHeight * 2) {
-				break;
-			}
+			await sleep(100);
+			if (lastItem.offsetTop > scrollY + window.innerHeight * 2) break;
 		}
 		rendering = false;
+	}
+
+	async function loadNextItem() {
+		if (renderItems.length < items.length) {
+			rendering = true;
+			renderItems = [...renderItems, items[renderItems.length]];
+		}
 	}
 
 	$: resetState(importedItems);
@@ -128,7 +145,7 @@
 	</div>
 
 	{#each renderItems as item, i (item.id)}
-		<div class="dark:text-gray-300">
+		<div transition:fade|local class="dark:text-gray-300">
 			{#if i + 1 < items.length}
 				<ItemDetail
 					on:finish={onFinish}

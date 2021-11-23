@@ -40,17 +40,17 @@ export async function getTotalDescendents(id: number): Promise<number> {
 // caches for 1 minute
 // invalidate ignores the cache limit
 export async function getItem(id: number, invalidate: boolean): Promise<Item> {
-	const currentTime = (new Date()).getTime();
-	if (itemStore[id] && (!invalidate || (currentTime - itemStore[id].lastUpdated) < 60000)) {
+	const currentTime = new Date().getTime();
+	if (itemStore[id] && (!invalidate || currentTime - itemStore[id].lastUpdated < 60000)) {
 		return itemStore[id];
 	}
 	const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
 	const res = await fetch(url);
 	if (!res.ok) throw 'Error fetching data from API';
 
-	const item: Item = await res.json();
-	if (item === null) createNullItem(id, 0);
-	if (item === undefined) createUndefinedItem(id, 0);
+	let item: Item = await res.json();
+	if (item === null) item = createNullItem(id, 0);
+	if (item === undefined) item = createUndefinedItem(id, 0);
 	item.lastUpdated = currentTime;
 
 	itemStore[id] = item;
@@ -63,7 +63,7 @@ export async function getItems(ids: number[]): Promise<Item[]> {
 		const getItemFns = ids.map((val) => getItem(val, true));
 		return await Promise.all(getItemFns);
 	} catch (err) {
-		console.log('getItems() error');
+		console.log('getItems() error: ', err);
 	}
 	return [];
 }
@@ -85,8 +85,8 @@ export function createNullItem(id: number, index: number): Item {
 		parts: [],
 		parent: 0,
 		deleted: false,
-		descendants: [],
-		lastUpdated: (new Date()).getTime(),
+		descendants: 0,
+		lastUpdated: new Date().getTime()
 	};
 }
 
@@ -107,7 +107,7 @@ export function createUndefinedItem(id: number, index: number): Item {
 		parts: [],
 		parent: 0,
 		deleted: false,
-		descendants: [],
-		lastUpdated: (new Date()).getTime(),
+		descendants: 0,
+		lastUpdated: new Date().getTime()
 	};
 }

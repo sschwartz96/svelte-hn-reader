@@ -9,7 +9,6 @@ export function getBaseURL(url: string): string {
 	return parts.length > 1 ? parts[0] : url;
 }
 
-
 // getTimeAgo takes unix time in seconds and give the appropriate "hours ago" text
 export function getTimeAgo(time: number): string {
 	const sub = new Date().getTime() - time * 1000;
