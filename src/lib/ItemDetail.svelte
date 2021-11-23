@@ -61,7 +61,7 @@
 	export let nextAncestor: number; // nextAncestor is the next "ancestor of the list" only null if we are at the bottom
 	/*** END expansion and contraction ***/
 
-	// basic functionality
+	/*** basic functionality ***/
 	let children: Item[] = [];
 
 	onMount(async () => {

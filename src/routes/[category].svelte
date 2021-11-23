@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import type { Item } from '$lib/item';
+	import { getItem, Item } from '$lib/item';
 
 	/**
 	 * @type {import('@sveltejs/kit').Load}
@@ -49,7 +49,6 @@
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
-	import { getItems } from '$lib/item';
 	import { prettifyCategory, sleep } from '$lib/util';
 	import { browser } from '$app/env';
 	import { currentCategory, currentCategoryItemIds, currentCategoryItems } from '$lib/stores';
@@ -65,6 +64,7 @@
 	let scrollY: number;
 	let fetching = false;
 	let mounted = false;
+	let capped = false; // capped only set to true if we are at the end of the storyIds length
 
 	// ran everytime we navigate to a category
 	onMount(async () => {
@@ -75,20 +75,26 @@
 	async function fetchItems() {
 		fetching = true;
 		showMoreButton = false;
-		const items = await getItems(storyIds.slice(prevLength, maxLength));
-		for (let i = 0; i < items.length; i++) {
-			/* await sleep(25); */
-			$currentCategoryItems = stories = [...stories, items[i]];
+		for (let i = 0; i < maxLength - prevLength; i++) {
+			const index = prevLength + i;
+			const item = await getItem(storyIds[index], true);
+			await sleep(10);
+			$currentCategoryItems = stories = [...stories, item];
 		}
 		fetching = false;
 		showMoreButton = true;
 	}
 
 	async function fetchMore(amount: number) {
-		if (!fetching && mounted) {
-			prevLength = maxLength;
-			maxLength += amount;
-			/* sleep(100); */
+		if (!fetching && !capped && mounted) {
+			if (maxLength + amount > storyIds.length) {
+				prevLength = maxLength;
+				maxLength = storyIds.length;
+				capped = true;
+			} else {
+				prevLength = maxLength;
+				maxLength += amount;
+			}
 			fetchItems();
 		}
 	}
@@ -107,10 +113,6 @@
 		showMoreButton = false; // hide while loading
 
 		stories = new Array<Item>();
-		// awaits (and tick(), but tick() wasn't enough???) to allow out transition
-		/* await sleep(100); */
-		/* await tick(); */
-		/* await sleep(100); */
 		fetchItems();
 	}
 
@@ -137,7 +139,7 @@
 
 	{#each stories as story, i}
 		<div
-			in:fly|local={{ x: 100 }}
+			in:fly|local={{ x: 50, duration: 500 }}
 			id="{story.id}_scroll"
 			class="flex space-x-2 items-baseline mb-2"
 		>

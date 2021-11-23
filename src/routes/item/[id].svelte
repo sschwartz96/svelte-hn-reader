@@ -9,7 +9,7 @@
 		const id: number = page.params.id;
 		/* const url = `https://hacker-news.firebaseio.com/v0/item/${id}.json`; */
 		let item: Item;
-		let items: Item[];
+		let items: Item[] = [];
 
 		// get parent item
 		try {
@@ -23,16 +23,17 @@
 		}
 
 		// get all children
-		try {
-			items = await getItems(item.kids);
-		} catch (err) {
-			return {
-				props: {
-					errorMessage: 'Failed to retrieve data from API'
-				}
-			};
+		if (item.kids && item.kids.length > 0) {
+			try {
+				items = await getItems(item.kids);
+			} catch (err) {
+				return {
+					props: {
+						errorMessage: 'Failed to retrieve data from API'
+					}
+				};
+			}
 		}
-
 		return {
 			props: {
 				parentItem: item,
@@ -48,7 +49,7 @@
 	import ItemSummary from '$lib/ItemSummary.svelte';
 	import { sleep } from '$lib/util';
 	import { browser } from '$app/env';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	let items: Item[] = [];
@@ -91,7 +92,6 @@
 	// checkScroll waits for slide transition to complete and then loads more comments if necessary
 	async function checkScroll(y: number) {
 		if (browser && !rendering && renderItems.length > 0) {
-			console.log('checking scroll');
 			await sleep(300); // must wait for animation to  be performed
 			const lastRenderedComment = document.getElementById(
 				renderItems[renderItems.length - 1].id.toString()
@@ -119,19 +119,16 @@
 				count++;
 			}
 			await sleep(100);
-			if (lastItem.offsetTop > scrollY + window.innerHeight * 2) {
-				console.log(renderItems[renderItems.length - 1].id.toString());
-				console.log('lastItem top position is greater than window height');
-				console.log(`${lastItem.offsetTop} > ${scrollY} + ${window.innerHeight} * 2`);
-				break;
-			}
+			if (lastItem.offsetTop > scrollY + window.innerHeight * 2) break;
 		}
 		rendering = false;
 	}
 
 	async function loadNextItem() {
-		rendering = true;
-		renderItems = [...renderItems, items[renderItems.length]];
+		if (renderItems.length < items.length) {
+			rendering = true;
+			renderItems = [...renderItems, items[renderItems.length]];
+		}
 	}
 
 	$: resetState(importedItems);
